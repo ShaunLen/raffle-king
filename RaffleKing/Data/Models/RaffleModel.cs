@@ -7,8 +7,8 @@ namespace RaffleKing.Data.Models;
 /// Represents a raffle with its associated details.
 /// This model is used to store and manage details of a raffle in the database.
 /// </summary>
-/// <param name="title">The title of the raffle, max 30 words.</param>
-/// <param name="description">A detailed description of the raffle, max 500 words.</param>
+/// <param name="title">The title of the raffle, max 30 characters.</param>
+/// <param name="description">A detailed description of the raffle, max 500 characters.</param>
 /// <param name="drawDate">The scheduled draw date/time of the raffle.</param>
 /// <param name="isBundle">Indicates whether the raffle is a bundle (one winner for all prizes) or not (one winner for
 /// each prize individually).</param>
