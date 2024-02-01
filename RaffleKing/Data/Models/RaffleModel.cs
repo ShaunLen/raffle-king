@@ -13,14 +13,14 @@ public class RaffleModel
     public int RaffleId { get; private init; }
 
     /// <summary>
-    /// The title of the raffle.
+    /// The title of the raffle, up to 30 characters.
     /// </summary>
     [Required]
     [StringLength(30)]
     public string Title { get; set; } = "Untitled Raffle";
 
     /// <summary>
-    /// The description of the raffle.
+    /// The description of the raffle, up to 500 characters.
     /// </summary>
     [Required]
     [StringLength(500)]
