@@ -32,6 +32,6 @@ public class PrizeModel
     [ForeignKey("RaffleModel")]
     public int RaffleId { get; set; } = raffleId;
 
-    // Navigation property
+    // Raffle reference
     public virtual RaffleModel? Raffle { get; set; }
 }
