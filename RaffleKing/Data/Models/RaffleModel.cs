@@ -44,6 +44,7 @@ public class RaffleModel
     // Identity user reference
     public virtual ApplicationUser? RaffleHolder { get; set; }
     
-    // Navigation property (initialised to prevent null references)
+    // Navigation properties (initialised to prevent null references)
     public virtual ICollection<PrizeModel> Prizes { get; set; } = new HashSet<PrizeModel>();
+    public virtual ICollection<EntryModel> Entries { get; set; } = new HashSet<EntryModel>();
 }
