@@ -1,0 +1,11 @@
+﻿<MudNavMenu Margin="Margin.Normal" Color="Color.Primary" Bordered="true">
+    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">Dashboard</MudNavLink>
+    <MudNavGroup Title="Raffles" @bind-Expanded="_isRafflesExpanded" @bind-HideExpandIcon="IsDrawerClosed" Icon="@Icons.Custom.Uncategorized.ChessKing">
+        <MudNavLink Href="/raffles/my-raffles" Match="NavLinkMatch.All" Icon="@Icons.Custom.Uncategorized.ChessQueen">My Raffles</MudNavLink>
+        <MudNavLink Href="/raffles" Match="NavLinkMatch.All" Icon="@Icons.Custom.Uncategorized.ChessKnight">Entered Raffles</MudNavLink>
+        <MudNavLink Href="/raffles" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Start">Active Raffles</MudNavLink>
+        <MudNavLink Href="/raffles" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.DoNotDisturb">Finished Raffles</MudNavLink>
+    </MudNavGroup>
+    <MudNavLink Href="/about" Icon="@Icons.Material.Filled.Info">About</MudNavLink>
+    <MudNavLink Href="/settings" Icon="@Icons.Material.Filled.Settings">Settings</MudNavLink>
+</MudNavMenu>
