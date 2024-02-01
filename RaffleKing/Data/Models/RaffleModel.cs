@@ -3,48 +3,69 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RaffleKing.Data.Models;
 
-/// <summary>
-/// Represents a raffle with its associated details.
-/// This model is used to store and manage details of a raffle in the database.
-/// </summary>
-/// <param name="title">The title of the raffle, max 30 characters.</param>
-/// <param name="description">A detailed description of the raffle, max 500 characters.</param>
-/// <param name="drawDate">The scheduled draw date/time of the raffle.</param>
-/// <param name="isBundle">Indicates whether the raffle is a bundle (one winner for all prizes) or not (one winner for
-/// each prize individually).</param>
-/// <param name="raffleHolderId">The identifier of the raffle holder, linking to an ApplicationUser.</param>
 public class RaffleModel
-    (string title, string description, DateTime drawDate, bool isBundle, string raffleHolderId)
 {
+    /// <summary>
+    /// Auto-generated primary key for the raffle.
+    /// </summary>
     [Key] 
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)] 
-    public int RaffleId { get; set; } // auto-generated
-    
-    [Required] 
-    [StringLength(30)] 
-    public string Title { get; set; } = title;
-    
+    public int RaffleId { get; private init; }
+
+    /// <summary>
+    /// The title of the raffle.
+    /// </summary>
+    [Required]
+    [StringLength(30)]
+    public string Title { get; set; } = "Untitled Raffle";
+
+    /// <summary>
+    /// The description of the raffle.
+    /// </summary>
     [Required]
     [StringLength(500)]
-    public string Description { get; set; } = description;
+    public string Description { get; set; } = "Missing description.";
     
+    /// <summary>
+    /// The scheduled draw date/time of the raffle.
+    /// </summary>
     [Required]
-    public DateTime DrawDate { get; set; } = drawDate;
+    public DateTime DrawDate { get; set; }
 
-    // Set to true when the raffle is published (after prizes are added)
+    /// <summary>
+    /// Whether the raffle is active or not. Set to false by default. Should be set to true when the raffle is
+    /// published (after prizes are added) then set to false again when the raffle has been drawn.
+    /// </summary>
     [Required] 
     public bool IsActive { get; set; } = false; 
     
+    /// <summary>
+    /// Indicates whether the raffle is a bundle (single winner drawn for all prizes) or not (individual winner drawn
+    /// for each prize).
+    /// </summary>
     [Required]
-    public bool IsBundle { get; set; } = isBundle;
+    public bool IsBundle { get; init; } = true;
     
+    /// <summary>
+    /// The identifier of the raffle holder, linking to an ApplicationUser.
+    /// </summary>
     [ForeignKey("AspNetUsers")]
-    public string RaffleHolderId { get; set; } = raffleHolderId;
+    public string RaffleHolderId { get; init; } = null!;
     
-    // Identity user reference
+    /// <summary>
+    /// Navigation property to the ApplicationUser who is the holder of the raffle.
+    /// </summary>
     public virtual ApplicationUser? RaffleHolder { get; set; }
     
-    // Navigation properties (initialised to prevent null references)
+    /// <summary>
+    /// Collection of PrizeModel objects associated with the raffle.
+    /// Represents the prizes available in this raffle.
+    /// </summary>
     public virtual ICollection<PrizeModel> Prizes { get; set; } = new HashSet<PrizeModel>();
+    
+    /// <summary>
+    /// Collection of EntryModel objects associated with the raffle.
+    /// Represents all entries submitted for this raffle.
+    /// </summary>
     public virtual ICollection<EntryModel> Entries { get; set; } = new HashSet<EntryModel>();
 }
