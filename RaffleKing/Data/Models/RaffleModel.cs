@@ -5,18 +5,16 @@ namespace RaffleKing.Data.Models;
 
 /// <summary>
 /// Represents a raffle with its associated details.
-/// This model is used to store and manage data related to a raffle in the database.
+/// This model is used to store and manage details of a raffle in the database.
 /// </summary>
 /// <param name="title">The title of the raffle, max 30 words.</param>
 /// <param name="description">A detailed description of the raffle, max 500 words.</param>
 /// <param name="drawDate">The scheduled draw date/time of the raffle.</param>
-/// <param name="isActive">Indicates whether the raffle is currently active.
-/// False upon creation, True when raffle is published and False when raffle has finished.</param>
 /// <param name="isBundle">Indicates whether the raffle is a bundle (one winner for all prizes) or not (one winner for
 /// each prize individually).</param>
 /// <param name="raffleHolderId">The identifier of the raffle holder, linking to an ApplicationUser.</param>
 public class RaffleModel
-    (string title, string description, DateTime drawDate, bool isActive, bool isBundle, string raffleHolderId)
+    (string title, string description, DateTime drawDate, bool isBundle, string raffleHolderId)
 {
     [Key] 
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)] 
