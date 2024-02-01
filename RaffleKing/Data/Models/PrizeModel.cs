@@ -3,35 +3,43 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RaffleKing.Data.Models;
 
-/// <summary>
-/// Represents an individual prize in a raffle.
-/// This model is used to store and manage details of each prize associated with a raffle.
-/// </summary>
-/// <param name="name">The name of the prize, max 30 characters.</param>
-/// <param name="description">A detailed description of the prize, max 500 characters.</param>
-/// <param name="quantity">The quantity of this prize available in the raffle.</param>
-/// <param name="raffleId">The identifier of the raffle to which this prize is associated.</param>
 public class PrizeModel
-    (string name, string description, int quantity, int raffleId)
 {
+    /// <summary>
+    /// Auto-generated primary key for the prize.
+    /// </summary>
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int PrizeId { get; set; } // auto-generated
+    public int PrizeId { get; private init; }
 
+    /// <summary>
+    /// The title of the prize, up to 30 characters.
+    /// </summary>
     [Required]
     [StringLength(30)]
-    public string Name { get; set; } = name;
+    public string Title { get; set; } = "Untitled Prize";
 
+    /// <summary>
+    /// The description of the prize, up to 500 characters.
+    /// </summary>
     [Required]
     [StringLength(500)]
-    public string Description { get; set; } = description;
+    public string Description { get; set; } = "Missing description";
 
+    /// <summary>
+    /// The quantity of this prize available in the raffle.
+    /// </summary>
     [Required]
-    public int Quantity { get; set; } = quantity;
+    public int Quantity { get; init; } = 1;
 
+    /// <summary>
+    /// The identifier of the raffle to which this prize is associated.
+    /// </summary>
     [ForeignKey("RaffleModel")]
-    public int RaffleId { get; set; } = raffleId;
+    public int RaffleId { get; init; }
 
-    // Raffle reference
+    /// <summary>
+    /// Navigation property to the associated raffle.
+    /// </summary>
     public virtual RaffleModel? Raffle { get; set; }
 }
