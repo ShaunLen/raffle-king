@@ -18,9 +18,24 @@
 </head>
 
 <body>
-<Routes @rendermode="InteractiveServer"/>
+<Routes @rendermode="RenderModeForPage"/>
 <script src="_framework/blazor.web.js"></script>
 <script src="_content/MudBlazor/MudBlazor.min.js"></script>
 </body>
 
 </html>
+
+@code 
+{
+    /*
+     * There is an issue currently pending a solution by Microsoft where the Identity pages do not work with
+     * the InteractiveServer render mode. This workaround was taken from Stack Overflow at the below link:
+     * https://stackoverflow.com/questions/77599233/blazor-net-8-and-global-interactivity-issue-with-identity
+     */
+    
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+    
+    private IComponentRenderMode? RenderModeForPage => 
+        HttpContext.Request.Path.StartsWithSegments("/Account") ? null : InteractiveServer;
+}
