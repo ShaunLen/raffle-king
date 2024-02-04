@@ -13,15 +13,15 @@ public class EntryModel
     public int EntryId { get; private init; }
 
     /// <summary>
-    /// The identifier of the associated raffle.
+    /// The identifier of the associated draw.
     /// </summary>
-    [ForeignKey("RaffleModel")]
-    public int RaffleId { get; init; }
+    [ForeignKey(nameof(Draw))]
+    public int Id { get; init; }
 
     /// <summary>
     /// (Nullable) The identifier of the user, if the entry is made by a registered user.
     /// </summary>
-    [ForeignKey("AspNetUsers")]
+    [ForeignKey(nameof(User))]
     public string? UserId { get; set; }
 
     /// <summary>
@@ -42,6 +42,22 @@ public class EntryModel
     /// </summary>
     [StringLength(32)]
     public string? GuestReferenceCode { get; set; }
+    
+    /// <summary>
+    /// (Nullable) Only relevant for lotteries, the selected "lucky number" associated with the entry.
+    /// </summary>
+    public int? LuckyNumber { get; set; }
+
+    /// <summary>
+    /// Whether or not this entry has won a prize, false by default. If set to true, PrizeId will also be
+    /// populated.
+    /// </summary>
+    public bool IsWinner { get; set; } = false;
+    
+    /// <summary>
+    /// (Nullable) The identifier of the prize won by this entry, if any.
+    /// </summary>
+    public int? PrizeId { get; set; }
 
     /// <summary>
     /// Navigation property to the associated ApplicationUser (if any).
@@ -49,7 +65,12 @@ public class EntryModel
     public virtual ApplicationUser? User { get; set; }
     
     /// <summary>
-    /// Navigation property to the associated Raffle.
+    /// Navigation property to the associated draw.
     /// </summary>
-    public virtual RaffleModel? Raffle { get; set; }
+    public virtual DrawModel? Draw { get; set; }
+    
+    /// <summary>
+    /// Navigation property to the associated prize, if this entry is a winner.
+    /// </summary>
+    public virtual PrizeModel? Prize { get; set; }
 }
