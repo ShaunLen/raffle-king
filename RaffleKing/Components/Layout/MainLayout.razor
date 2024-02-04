@@ -5,17 +5,22 @@
     <MudLayout>
         @* Top Nav *@
         <MudAppBar Elevation="0">
-            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Primary" Edge="Edge.Start" OnClick="@(_ => ToggleDrawer())" />
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Primary" Edge="Edge.Start" 
+                           OnClick="@(_ => ToggleDrawer())" />
             <MudText Typo="Typo.h6" Color="Color.Primary">RAFFLE KING</MudText>
             <MudSpacer/>
             <div class="d-flex">
-                <MudButton OnClick="@ToggleAccountPopover" StartIcon="@Icons.Material.Filled.AccountCircle">Hi, Shaun!</MudButton>
-                <MudPopover Paper="true" Open="@_isAccountPopoverOpen" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopCenter">
+                <MudButton OnClick="@ToggleAccountPopover" StartIcon="@Icons.Material.Filled.AccountCircle">
+                    Hi, Shaun!
+                </MudButton>
+                <MudPopover Paper="true" Open="@_isAccountPopoverOpen" AnchorOrigin="Origin.BottomRight" 
+                            TransformOrigin="Origin.TopCenter">
                     <AccountPopover />
                 </MudPopover>
             </div>
             <MudDivider Vertical="true" Class="my-4 ml-2" FlexItem="true"></MudDivider>
-            <MudToggleIconButton @bind-Toggled="@_isDarkModeActive" Icon="@Icons.Material.Filled.LightMode" ToggledIcon="@Icons.Material.Filled.DarkMode"></MudToggleIconButton>
+            <MudToggleIconButton @bind-Toggled="@_isDarkModeActive" Icon="@Icons.Material.Filled.LightMode" 
+                                 ToggledIcon="@Icons.Material.Filled.DarkMode"></MudToggleIconButton>
             <MudIconButton Icon="@Icons.Custom.Brands.GitHub"></MudIconButton>
         </MudAppBar>
         
