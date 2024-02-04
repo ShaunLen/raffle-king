@@ -1,34 +1,52 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+
 <MudThemeProvider @bind-IsDarkMode="@_isDarkModeActive" Theme="DefaultTheme"/>
 
 <div class="page mud-layout">
     <MudLayout>
         @* Top Nav *@
         <MudAppBar Elevation="0">
-            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Primary" Edge="Edge.Start" 
-                           OnClick="@(_ => ToggleDrawer())" />
+            @if (!_isAccountPage)
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Primary" Edge="Edge.Start"
+                               OnClick="@(_ => ToggleDrawer())"/>
+            }
             <MudText Typo="Typo.h6" Color="Color.Primary">RAFFLE KING</MudText>
             <MudSpacer/>
-            <div class="d-flex">
-                <MudButton OnClick="@ToggleAccountPopover" StartIcon="@Icons.Material.Filled.AccountCircle">
-                    Hi, Shaun!
-                </MudButton>
-                <MudPopover Paper="true" Open="@_isAccountPopoverOpen" AnchorOrigin="Origin.BottomRight" 
-                            TransformOrigin="Origin.TopCenter">
-                    <AccountPopover />
-                </MudPopover>
-            </div>
+            @if (_isAccountPage)
+            {
+                <MudButton Href="/" StartIcon="@Icons.Material.Filled.ArrowBack">Return to Dashboard</MudButton>
+            }
+            else
+            {
+                <div class="d-flex">
+                    <MudButton OnClick="@ToggleAccountPopover" StartIcon="@Icons.Material.Filled.AccountCircle">
+                        Hi, Shaun!
+                    </MudButton>
+                    <MudPopover Paper="true" Open="@_isAccountPopoverOpen" AnchorOrigin="Origin.BottomRight"
+                                TransformOrigin="Origin.TopCenter">
+                        <AccountPopover/>
+                    </MudPopover>
+                </div>
+            }
             <MudDivider Vertical="true" Class="my-4 ml-2" FlexItem="true"></MudDivider>
-            <MudToggleIconButton @bind-Toggled="@_isDarkModeActive" Icon="@Icons.Material.Filled.LightMode" 
-                                 ToggledIcon="@Icons.Material.Filled.DarkMode"></MudToggleIconButton>
-            <MudIconButton Icon="@Icons.Custom.Brands.GitHub"></MudIconButton>
+            @if (!_isAccountPage)
+            {
+                <MudToggleIconButton @bind-Toggled="@_isDarkModeActive" Icon="@Icons.Material.Filled.LightMode"
+                                     ToggledIcon="@Icons.Material.Filled.DarkMode"></MudToggleIconButton>
+            }
+            <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Href="https://github.com/ShaunLen/raffle-king/"/>
         </MudAppBar>
         
-        @* Left Nav *@
-        <MudDrawer @bind-Open="_isDrawerOpen" ClipMode="DrawerClipMode.Docked" Fixed="true" 
-                   Variant="@DrawerVariant.Mini" OpenMiniOnHover="true" @onmouseleave="@CloseDrawer">
-            <LeftNav @ref="_leftNav" IsDrawerClosed="!_isDrawerOpen" />
-        </MudDrawer>
+        @if (!_isAccountPage)
+        {
+            @* Left Nav *@
+            <MudDrawer @bind-Open="_isDrawerOpen" ClipMode="DrawerClipMode.Docked" Fixed="true" 
+                       Variant="@DrawerVariant.Mini" OpenMiniOnHover="true" @onmouseleave="@CloseDrawer">
+                <LeftNav @ref="_leftNav" IsDrawerClosed="!_isDrawerOpen" />
+            </MudDrawer>
+        }
         
         @* Page Content *@
         <MudMainContent>

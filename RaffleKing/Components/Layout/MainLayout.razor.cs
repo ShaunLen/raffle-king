@@ -1,4 +1,5 @@
-﻿using MudBlazor;
+﻿using Microsoft.AspNetCore.Components;
+using MudBlazor;
 
 namespace RaffleKing.Components.Layout;
 
@@ -9,6 +10,13 @@ public partial class MainLayout
     private bool _isDrawerOpen;
     private bool _isDrawerHeldOpen;
     private bool _isAccountPopoverOpen;
+    private bool _isAccountPage;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _isAccountPage = NavigationManager.Uri.Contains("/Account");
+    }
 
     /// <summary>
     /// Closes the MudDrawer containing LeftNav, if not being held open through use of the menu button.
