@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace RaffleKing.Infrastructure;
 
@@ -11,7 +12,8 @@ public static class StartupExtensions
             .MapGet("/Logout", async (HttpContext context, string returnUrl = "/") =>
             {
                 await context.SignOutAsync(IdentityConstants.ApplicationScheme);
-                context.Response.Redirect(returnUrl);
+                var logoutReturnUrl = QueryHelpers.AddQueryString(returnUrl, "from", "logout");
+                context.Response.Redirect(logoutReturnUrl);
             })
             .RequireAuthorization();
     }
