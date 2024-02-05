@@ -5,6 +5,7 @@ using RaffleKing.Components;
 using RaffleKing.Components.Account;
 using RaffleKing.Data;
 using MudBlazor.Services;
+using RaffleKing.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,7 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
+builder.Services.AddScoped<AuthenticationService>();
 
 builder.Services.AddAuthentication(options =>
     {
