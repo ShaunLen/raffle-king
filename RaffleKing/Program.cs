@@ -5,7 +5,7 @@ using RaffleKing.Components;
 using RaffleKing.Components.Account;
 using RaffleKing.Data;
 using MudBlazor.Services;
-using RaffleKing.Services;
+using RaffleKing.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +19,6 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
-builder.Services.AddScoped<AuthenticationService>();
 
 builder.Services.AddAuthentication(options =>
     {
@@ -66,6 +65,8 @@ app.MapRazorComponents<App>()
 
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();
+
+app.MapAccountServices();
 
 // Set up Identity roles
 using (var scope = app.Services.CreateScope())
