@@ -1,5 +1,6 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <MudThemeProvider @bind-IsDarkMode="@_isDarkModeActive" Theme="DefaultTheme"/>
 
@@ -21,10 +22,19 @@
             else
             {
                 <div class="d-flex">
-                    <MudButton OnClick="@ToggleAccountPopover" StartIcon="@Icons.Material.Filled.AccountCircle">
-                        Hi, Shaun!
-                    </MudButton>
-                    <MudPopover Paper="true" Open="@_isAccountPopoverOpen" AnchorOrigin="Origin.BottomRight"
+                    <AuthorizeView>
+                        <Authorized>
+                            <MudButton OnClick="@ToggleAccountPopover" StartIcon="@Icons.Material.Filled.AccountCircle">
+                                Hi, @_username!
+                            </MudButton>
+                        </Authorized>
+                        <NotAuthorized>
+                            <MudButton OnClick="@ToggleAccountPopover" StartIcon="@Icons.Material.Filled.AccountCircle">
+                                Account
+                            </MudButton>
+                        </NotAuthorized>
+                    </AuthorizeView>
+                    <MudPopover Paper="true" Open="@_isAccountPopoverOpen" AnchorOrigin="Origin.BottomCenter"
                                 TransformOrigin="Origin.TopCenter">
                         <AccountPopover/>
                     </MudPopover>
@@ -38,16 +48,16 @@
             }
             <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Href="https://github.com/ShaunLen/raffle-king/"/>
         </MudAppBar>
-        
+
         @if (!_isAccountPage)
         {
             @* Left Nav *@
-            <MudDrawer @bind-Open="_isDrawerOpen" ClipMode="DrawerClipMode.Docked" Fixed="true" 
+            <MudDrawer @bind-Open="_isDrawerOpen" ClipMode="DrawerClipMode.Docked" Fixed="true"
                        Variant="@DrawerVariant.Mini" OpenMiniOnHover="true" @onmouseleave="@CloseDrawer">
-                <LeftNav @ref="_leftNav" IsDrawerClosed="!_isDrawerOpen" />
+                <LeftNav @ref="_leftNav" IsDrawerClosed="!_isDrawerOpen"/>
             </MudDrawer>
         }
-        
+
         @* Page Content *@
         <MudMainContent>
             <MudContainer Class="mt-8">

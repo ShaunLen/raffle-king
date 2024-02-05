@@ -5,6 +5,7 @@ namespace RaffleKing.Components.Layout;
 
 public partial class MainLayout
 {
+    private string? _username;
     private bool _isDarkModeActive = true;
     private LeftNav _leftNav = null!;
     private bool _isDrawerOpen;
@@ -16,6 +17,16 @@ public partial class MainLayout
     {
         base.OnInitialized();
         _isAccountPage = NavigationManager.Uri.Contains("/Account");
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity == null)
+            return;
+        
+        _username = user.Identity.Name;
     }
 
     /// <summary>

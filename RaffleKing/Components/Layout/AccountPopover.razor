@@ -1,7 +1,20 @@
-﻿<MudList Clickable="true">
-    <MudListItem Avatar="@Icons.Material.Filled.ManageAccounts">Profile</MudListItem>
-    <MudDivider DividerType="DividerType.Inset" />
-    <MudListItem Avatar="@Icons.Material.Filled.AdminPanelSettings">Admin Dashboard</MudListItem>
-    <MudDivider DividerType="DividerType.Inset" />
-    <MudListItem Avatar="@Icons.Material.Filled.Logout">Log Out</MudListItem>
+﻿@inject NavigationManager NavigationManager
+
+<MudList Clickable="true">
+    <AuthorizeView Roles="Admin">
+        <MudListItem Avatar="@Icons.Material.Filled.AdminPanelSettings">Admin Dashboard</MudListItem>
+        <MudDivider DividerType="DividerType.Inset"/>
+    </AuthorizeView>
+    <AuthorizeView>
+        <Authorized>
+            <MudListItem Avatar="@Icons.Material.Filled.ManageAccounts">Manage Account</MudListItem>
+            <MudDivider DividerType="DividerType.Inset"/>
+            <MudListItem OnClick="@Logout" Avatar="@Icons.Material.Filled.Logout">Log Out</MudListItem>
+        </Authorized>
+        <NotAuthorized>
+            <MudListItem Href="Account/Login" Avatar="@Icons.Material.Filled.Login">Log In</MudListItem>
+            <MudDivider DividerType="DividerType.Inset"/>
+            <MudListItem Href="Account/Register" Avatar="@Icons.Material.Filled.PersonAddAlt1">Register</MudListItem>
+        </NotAuthorized>
+    </AuthorizeView>
 </MudList>
