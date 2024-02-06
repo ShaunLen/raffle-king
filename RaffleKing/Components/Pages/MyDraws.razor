@@ -1,0 +1,8 @@
+﻿@page "/draws/my-draws"
+@using Microsoft.AspNetCore.Authorization
+@using RaffleKing.Components.Shared
+@attribute [Authorize(Roles="Host, Admin")]
+
+<PageTitle>My Draws</PageTitle>
+
+<DrawList ListType="DrawListType.HostedDraws"/>
