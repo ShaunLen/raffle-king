@@ -23,7 +23,7 @@ public class DrawModel
     /// </summary>
     [Required]
     [StringLength(30)]
-    public string? Title { get; set; } = null!;
+    public string Title { get; set; } = null!;
 
     /// <summary>
     /// The description of the draw, up to 500 characters.
