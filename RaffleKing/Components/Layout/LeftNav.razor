@@ -1,18 +1,17 @@
 ﻿<MudNavMenu Margin="Margin.Normal" Color="Color.Primary" Bordered="true">
     <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">Dashboard</MudNavLink>
-    <MudNavGroup Title="Raffles" @bind-Expanded="_isRafflesExpanded" @bind-HideExpandIcon="IsDrawerClosed" 
+    <MudNavGroup Title="Draws" @bind-Expanded="_isRafflesExpanded" @bind-HideExpandIcon="IsDrawerClosed"
                  Icon="@Icons.Custom.Uncategorized.ChessKing">
-        <MudNavLink Href="/raffles/my-raffles" Match="NavLinkMatch.All" Icon="@Icons.Custom.Uncategorized.ChessQueen">
-            My Raffles
+        <AuthorizeView Roles="Host, Admin">
+            <MudNavLink Href="/draws/my-draws" Match="NavLinkMatch.All" Icon="@Icons.Custom.Uncategorized.ChessQueen">
+                My Draws
+            </MudNavLink>
+        </AuthorizeView>
+        <MudNavLink Href="/draws/active-draws" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Start">
+            Active Draws
         </MudNavLink>
-        <MudNavLink Href="/raffles" Match="NavLinkMatch.All" Icon="@Icons.Custom.Uncategorized.ChessKnight">
-            Entered Raffles
-        </MudNavLink>
-        <MudNavLink Href="/raffles" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Start">
-            Active Raffles
-        </MudNavLink>
-        <MudNavLink Href="/raffles" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.DoNotDisturb">
-            Finished Raffles
+        <MudNavLink Href="/draws/entered-draws" Match="NavLinkMatch.All" Icon="@Icons.Custom.Uncategorized.ChessKnight">
+            Entered Draws
         </MudNavLink>
     </MudNavGroup>
     <MudNavLink Href="/about" Icon="@Icons.Material.Filled.Info">About</MudNavLink>
