@@ -7,6 +7,8 @@ using RaffleKing.Components.Account;
 using RaffleKing.Data;
 using MudBlazor.Services;
 using RaffleKing.Infrastructure;
+using RaffleKing.Services;
+using RaffleKing.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +39,9 @@ builder.Services.AddAuthentication(options =>
         options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
     })
     .AddIdentityCookies();
+
+// Add CRUD services
+builder.Services.AddScoped<IDrawService, DrawService>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
                        throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
