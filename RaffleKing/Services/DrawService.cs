@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 using RaffleKing.Data;
 using RaffleKing.Data.Models;
 using RaffleKing.Services.Interfaces;
 
 namespace RaffleKing.Services;
 
-public class DrawService(ApplicationDbContext context) : IDrawService
+public class DrawService(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor) : IDrawService
 {
     /* Create Operations */
     public async Task AddNewDraw(DrawModel drawModel)
@@ -18,6 +19,19 @@ public class DrawService(ApplicationDbContext context) : IDrawService
     public async Task<List<DrawModel>?> GetAllDraws()
     {
         return await context.Draws.ToListAsync();
+    }
+
+    public async Task<List<DrawModel>?> GetHostedDraws()
+    {
+        var hostId = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (hostId == null)
+            return null;
+
+        var draws = await context.Draws
+            .Where(draw => draw.DrawHostId == hostId)
+            .ToListAsync();
+
+        return draws;
     }
 
     /* Update Operations */
