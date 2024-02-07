@@ -1,7 +1,7 @@
 ﻿<MudNavMenu Margin="Margin.Normal" Color="Color.Primary" Bordered="true">
     <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">Dashboard</MudNavLink>
     <MudNavGroup Title="Draws" @bind-Expanded="_isRafflesExpanded" @bind-HideExpandIcon="IsDrawerClosed"
-                 Icon="@Icons.Custom.Uncategorized.ChessKing">
+                 Icon="@Icons.Material.Filled.LocalActivity">
         <AuthorizeView Roles="Host, Admin">
             <MudNavLink Href="/draws/my-draws" Match="NavLinkMatch.All" Icon="@Icons.Custom.Uncategorized.ChessQueen">
                 My Draws
