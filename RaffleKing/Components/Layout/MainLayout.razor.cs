@@ -64,22 +64,25 @@ public partial class MainLayout
         Palette = new PaletteLight
         {
             Primary = "#0bba83",
-            TextPrimary = "#515151",
+            Tertiary = "#1b1b1b",
             Background = "#e9e9e9",
             Surface = "#ececec",
             DrawerBackground = "#ececec",
             AppbarBackground = "#f7f7f7",
             Divider = "#b5b5b5",
+            Info = "#534399"
         },
         PaletteDark = new PaletteDark
         {
             White = "#837162",
             Primary = "#0bba83",
+            Tertiary = "#f5f5f5",
             Background = "#151521",
             Surface = "#1b1b28",
             DrawerBackground = "#1b1b28",
             AppbarBackground = "#1e1e2d",
             TextPrimary = "#adadb1",
+            Info = "#534399"
         },
         Typography = new Typography
         {
