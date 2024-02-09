@@ -16,6 +16,11 @@ public class DrawService(ApplicationDbContext context, IHttpContextAccessor http
     }
 
     /* Read Operations */
+    public async Task<DrawModel?> GetDrawById(int drawId)
+    {
+        return await context.Draws.FirstOrDefaultAsync(draw => draw.Id == drawId);
+    }
+
     public async Task<List<DrawModel>?> GetAllDraws()
     {
         return await context.Draws.ToListAsync();
