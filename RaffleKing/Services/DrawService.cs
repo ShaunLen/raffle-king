@@ -34,6 +34,11 @@ public class DrawService(ApplicationDbContext context, IHttpContextAccessor http
         return draws;
     }
 
+    public async Task<List<DrawModel>?> GetActiveDraws()
+    {
+        return await context.Draws.Where(draw => draw.IsActive).ToListAsync();
+    }
+
     /* Update Operations */
     public async Task UpdateDraw(DrawModel drawModel)
     {

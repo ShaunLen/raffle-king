@@ -10,6 +10,7 @@ public interface IDrawService
     /* Read Operations */
     public Task<List<DrawModel>?> GetAllDraws();
     public Task<List<DrawModel>?> GetHostedDraws();
+    public Task<List<DrawModel>?> GetActiveDraws();
     
     /* Update Operations */
     public Task UpdateDraw(DrawModel drawModel);
