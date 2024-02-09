@@ -2,7 +2,7 @@
 @inject IDrawService DrawService
 
 <MudStack AlignItems="AlignItems.Center">
-    <MudText Typo="Typo.h1">@_headingPrefix <span style="color: #0bba83">Draws</span></MudText>
+    <MudText Typo="Typo.h1"><span style="color: #0bba83">@_headingPrefix</span> Draws</MudText>
     @if (ListType == DrawListType.HostedDraws)
     {
         // Display "Create Draw" button if ListType is HostedDraws
