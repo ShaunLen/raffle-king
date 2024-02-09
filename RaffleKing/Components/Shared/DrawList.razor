@@ -5,22 +5,26 @@
     <MudText Typo="Typo.h1">@_headingPrefix <span style="color: #0bba83">Draws</span></MudText>
     @if (ListType == DrawListType.HostedDraws)
     {
+        // Display "Create Draw" button if ListType is HostedDraws
         <MudButton Class="mb-4" Href="/draws/new-draw" Variant="Variant.Filled" Color="Color.Primary">
             Create a New Draw
         </MudButton>
     }
     @if (_draws == null)
     {
+        // If loading draws, display loading indicator
         <MudProgressCircular Size="Size.Large" Color="Color.Primary" Indeterminate="true"/>
     }
     else if(_draws.Count == 0)
     {
+        // If no draws are found, display text denoting this
         <MudText Typo="Typo.h4" Align="Align.Center">No Draws Found</MudText>
     }
     else
     {
         <MudGrid Justify="Justify.Center" Spacing="8">
-            @if (_draws.Any(draw => draw is { DrawType: DrawTypeEnum.Raffle, IsActive: false }))
+            @* Display active Raffles *@
+            @if (_draws.Any(draw => draw is { DrawType: DrawTypeEnum.Raffle, IsActive: true }))
             {
                 <MudItem>
                     <MudStack Justify="Justify.Center">
@@ -34,6 +38,7 @@
                     </MudStack>
                 </MudItem>
             }
+            @* Display active Lotteries *@
             @if (_draws.Any(draw => draw is { DrawType: DrawTypeEnum.Lottery, IsActive: true }))
             {
                 <MudItem>
@@ -48,33 +53,38 @@
                     </MudStack>
                 </MudItem>
             }
-            @if (_draws.Any(draw => draw is { DrawType: DrawTypeEnum.Raffle, IsActive: false }))
+            @if (ListType != DrawListType.ActiveDraws)
             {
-                <MudItem>
-                    <MudStack Justify="Justify.Center">
-                        <MudText Typo="Typo.h5" Align="Align.Center" Color="Color.Primary"><b>INACTIVE RAFFLES</b></MudText>
-                        @foreach (var draw in _draws.Where(
-                                      draw => draw is { DrawType: DrawTypeEnum.Raffle, IsActive: false }))
-                        {
-                            <DrawCard Title="@draw.Title" Description="@draw.Description" ListType="@ListType"
-                                      DrawDateTime="@draw.DrawDate"/>
-                        }
-                    </MudStack>
-                </MudItem>
-            }
-            @if (_draws.Any(draw => draw is { DrawType: DrawTypeEnum.Lottery, IsActive: false }))
-            {
-                <MudItem>
-                    <MudStack Justify="Justify.Center">
-                        <MudText Typo="Typo.h5" Align="Align.Center" Color="Color.Primary"><b>INACTIVE LOTTERIES</b></MudText>
-                        @foreach (var draw in _draws.Where(
-                                      draw => draw is { DrawType: DrawTypeEnum.Lottery, IsActive: false }))
-                        {
-                            <DrawCard Title="@draw.Title" Description="@draw.Description" ListType="@ListType"
-                                      DrawDateTime="@draw.DrawDate"/>
-                        }
-                    </MudStack>
-                </MudItem>
+                @* Display inactive Raffles *@
+                @if (_draws.Any(draw => draw is { DrawType: DrawTypeEnum.Raffle, IsActive: false }))
+                {
+                    <MudItem>
+                        <MudStack Justify="Justify.Center">
+                            <MudText Typo="Typo.h5" Align="Align.Center" Color="Color.Primary"><b>INACTIVE RAFFLES</b></MudText>
+                            @foreach (var draw in _draws.Where(
+                                          draw => draw is { DrawType: DrawTypeEnum.Raffle, IsActive: false }))
+                            {
+                                <DrawCard Title="@draw.Title" Description="@draw.Description" ListType="@ListType"
+                                          DrawDateTime="@draw.DrawDate"/>
+                            }
+                        </MudStack>
+                    </MudItem>
+                }
+                @* Display inactive Lotteries *@
+                @if (_draws.Any(draw => draw is { DrawType: DrawTypeEnum.Lottery, IsActive: false }))
+                {
+                    <MudItem>
+                        <MudStack Justify="Justify.Center">
+                            <MudText Typo="Typo.h5" Align="Align.Center" Color="Color.Primary"><b>INACTIVE LOTTERIES</b></MudText>
+                            @foreach (var draw in _draws.Where(
+                                          draw => draw is { DrawType: DrawTypeEnum.Lottery, IsActive: false }))
+                            {
+                                <DrawCard Title="@draw.Title" Description="@draw.Description" ListType="@ListType"
+                                          DrawDateTime="@draw.DrawDate"/>
+                            }
+                        </MudStack>
+                    </MudItem>
+                }
             }
         </MudGrid>
     }

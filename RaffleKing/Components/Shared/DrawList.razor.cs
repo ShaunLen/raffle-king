@@ -12,14 +12,19 @@ public enum DrawListType
 
 public partial class DrawList
 {
+    /// <summary>
+    /// The type of draw list (Active, Hosted or Entered).
+    /// </summary>
     [Parameter]
     public DrawListType ListType { get; set; }
     
+    /* Private Fields */
     private List<DrawModel>? _draws;
     private string? _headingPrefix;
 
     protected override async Task OnInitializedAsync()
     {
+        // Change list heading depending on list type
         switch (ListType)
         {
             case DrawListType.ActiveDraws:
