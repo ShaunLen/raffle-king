@@ -1,0 +1,60 @@
+﻿@page "/draws/new-draw"
+@using RaffleKing.Data.Models
+@using Microsoft.AspNetCore.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IDrawService DrawService
+@inject ISnackbar Snackbar
+@attribute [Authorize(Roles="Host, Admin")]
+
+<PageTitle>New Draw</PageTitle>
+
+<MudStack AlignItems="AlignItems.Center">
+    <MudText Typo="Typo.h1">Create a <span style="color: #0bba83">New Draw</span></MudText>
+    <MudGrid Justify="Justify.Center">
+        <MudItem>
+            <MudPaper Class="pa-4" Width="400px">
+                <MudForm >
+                    <MudText Typo="Typo.h6" Color="Color.Primary">Draw Details</MudText>
+                    <MudTextField T="string" @bind-Value="_title" Label="Draw Title" Required="true" Immediate="true"
+                                  RequiredError="Title is required!" MaxLength="20" Counter="20" AutoFocus="true"/>
+                    <MudTextField T="string" @bind-Value="_description" Label="Description" Required="true" 
+                                  RequiredError="Description is required!"MaxLength="500" Counter="500" 
+                                  Immediate="true" AutoGrow="true" HelperText=""/>
+                    <MudSelect @bind-Value="_drawType" Class="mb-4" Label="Draw Type" AnchorOrigin="Origin.BottomCenter">
+                        @foreach (DrawTypeEnum drawType in Enum.GetValues(typeof(DrawTypeEnum)))
+                        {
+                            <MudSelectItem Value="@drawType">@drawType</MudSelectItem>
+                        }
+                    </MudSelect>
+                    <MudText Typo="Typo.button">Is this a bundle?</MudText>
+                    <MudRadioGroup @bind-Value="_isBundle" >
+                        <MudRadio T="bool" Value="true">Yes</MudRadio>
+                        <MudRadio T="bool" Value="false">No</MudRadio>
+                    </MudRadioGroup>
+                    <MudNumericField @bind-Value="_maxEntriesTotal" Label="Max Entries Total" Variant="Variant.Text" 
+                                     Min="1" Max="99"/>
+                    <MudNumericField @bind-Value="_maxEntriesPerUser" Label="Max Entries Per User" Variant="Variant.Text" 
+                                     Min="1" Max="99"/>
+                    <MudDatePicker @bind-Date="_drawDate" Label="Draw Date"/>
+                    <MudTimePicker @bind-Time="_drawTime" Label="Draw Time"/>
+                    <MudButton OnClick="@OnSubmit" Class="mt-8" FullWidth="true" 
+                               StartIcon="@Icons.Material.Filled.AutoAwesome"Variant="Variant.Filled" 
+                               Color="Color.Primary">Create Draw</MudButton>
+                </MudForm>
+            </MudPaper>
+        </MudItem>
+        <MudItem>
+            <MudPaper Class="pa-4">
+                <MudText Typo="Typo.h6" Color="Color.Primary">FAQ</MudText>
+                <MudText Typo="Typo.button">What is a bundle?</MudText>
+                <MudText Typo="Typo.subtitle2">In a bundle draw, one winner will be awarded all prizes in the draw.<br/>
+                    Otherwise, a winner will be selected at random for each prize.</MudText>
+                <MudSpacer/>
+                <br/>
+                <MudText Typo="Typo.button">How do I add prizes?</MudText>
+                <MudText Typo="Typo.subtitle2">Upon creating the draw, you will be redirected to the draw page.<br/>
+                    You will be able to add, edit and remove prizes from there.</MudText>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudStack>
