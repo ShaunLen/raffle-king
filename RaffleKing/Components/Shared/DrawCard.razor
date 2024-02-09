@@ -1,8 +1,31 @@
-﻿<MudCard>
-    <MudCardHeader>
-        <CardHeaderContent>
-            <MudText Typo="Typo.h5">@Title</MudText>
-            <MudText Typo="Typo.body1">@Description</MudText>
-        </CardHeaderContent>
-    </MudCardHeader>
-</MudCard>
+﻿<MudPaper Class="pa-4 border-t-2 mud-border-primary" Width="400px">
+    @* Date and Time Display *@
+    <MudChip Size="Size.Small" Color="@_dateColor" Icon="@Icons.Material.Filled.CalendarMonth"
+             Label="true" Class="ml-0" Style="white-space: pre">
+        <b>Draw Date: </b> @_dateString
+    </MudChip>
+    @if (!_expired)
+    {
+        // Don't display draw time if expired
+        <MudChip Size="Size.Small" Color="Color.Info" Icon="@Icons.Material.Filled.AccessTime"
+                 Label="true" Class="ml-0" Style="white-space: pre">
+            <b>Draw Time: </b> @DrawDateTime.ToString("HH:mm")
+        </MudChip>
+    }
+
+    @* Draw Title and Description *@
+    <MudText Typo="Typo.h6" Class="mt-2" Color="Color.Tertiary">@Title</MudText>
+    <MudText Typo="Typo.body2" Class="mb-2">@Description</MudText>
+
+    @if (!_expired)
+    {
+        // Display percentage of entries remaining
+        // TODO: Switch placeholder percentage for calculated percentage
+        <MudText Typo="Typo.button" Color="Color.Info">50% Remaining</MudText>
+        <MudProgressLinear Striped="true" Color="Color.Info" Size="Size.Large" Value="50" Class="mt-0"/>
+    }
+    
+    @* View/Edit Draw Button 
+    TODO: Add navigation to draw page  *@
+    <MudButton Variant="Variant.Text" Color="Color.Primary" Class="mr-2 mt-4 pa-0 ml-0">@_buttonText</MudButton>
+</MudPaper>
