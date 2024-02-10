@@ -10,25 +10,25 @@ public class EntryModel
     /// </summary>
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int EntryId { get; private init; }
+    public int Id { get; private init; }
 
     /// <summary>
     /// The identifier of the associated draw.
     /// </summary>
     [ForeignKey(nameof(Draw))]
-    public int Id { get; init; }
+    public int DrawId { get; init; }
 
     /// <summary>
     /// (Nullable) The identifier of the user, if the entry is made by a registered user.
     /// </summary>
     [ForeignKey(nameof(User))]
-    public string? UserId { get; set; }
+    public string? UserId { get; init; }
 
     /// <summary>
     /// Indicates whether the entry is made by a guest.
     /// </summary>
     [Required]
-    public bool IsGuest { get; set; }
+    public bool IsGuest { get; init; }
 
     /// <summary>
     /// (Nullable) The email address of the guest, if the entry is made by a guest.
@@ -46,13 +46,13 @@ public class EntryModel
     /// <summary>
     /// (Nullable) Only relevant for lotteries, the selected "lucky number" associated with the entry.
     /// </summary>
-    public int? LuckyNumber { get; set; }
+    public int? LuckyNumber { get; init; }
 
     /// <summary>
-    /// Whether or not this entry has won a prize, false by default. If set to true, PrizeId will also be
+    /// Whether or not this entry has won a prize, false by default. When set to true, PrizeId will also be
     /// populated.
     /// </summary>
-    public bool IsWinner { get; set; } = false;
+    public bool IsWinner { get; set; }
     
     /// <summary>
     /// (Nullable) The identifier of the prize won by this entry, if any.

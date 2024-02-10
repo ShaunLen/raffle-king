@@ -10,14 +10,14 @@ public class PrizeModel
     /// </summary>
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int PrizeId { get; private init; }
+    public int Id { get; private init; }
 
     /// <summary>
     /// The title of the prize, up to 30 characters.
     /// </summary>
     [Required]
     [StringLength(30)]
-    public string Title { get; set; } = null!;
+    public string Title { get; init; } = null!;
 
     /// <summary>
     /// The description of the prize, up to 500 characters.
@@ -25,7 +25,7 @@ public class PrizeModel
     [Required]
     [StringLength(500)]
 
-    public string Description { get; set; } = null!;
+    public string Description { get; init; } = null!;
 
     /// <summary>
     /// The quantity of this prize available in the draw.
