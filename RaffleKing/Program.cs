@@ -42,6 +42,7 @@ builder.Services.AddAuthentication(options =>
 
 // Add CRUD services
 builder.Services.AddScoped<IDrawService, DrawService>();
+builder.Services.AddScoped<IPrizeService, PrizeService>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
                        throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
