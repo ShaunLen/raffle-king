@@ -269,11 +269,14 @@ namespace RaffleKing.Migrations
 
             modelBuilder.Entity("RaffleKing.Data.Models.EntryModel", b =>
                 {
-                    b.Property<int>("EntryId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EntryId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DrawId")
+                        .HasColumnType("int");
 
                     b.Property<string>("GuestEmail")
                         .HasMaxLength(255)
@@ -282,9 +285,6 @@ namespace RaffleKing.Migrations
                     b.Property<string>("GuestReferenceCode")
                         .HasMaxLength(32)
                         .HasColumnType("nvarchar(32)");
-
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
 
                     b.Property<bool>("IsGuest")
                         .HasColumnType("bit");
@@ -301,9 +301,9 @@ namespace RaffleKing.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("EntryId");
+                    b.HasKey("Id");
 
-                    b.HasIndex("Id");
+                    b.HasIndex("DrawId");
 
                     b.HasIndex("PrizeId");
 
@@ -314,11 +314,11 @@ namespace RaffleKing.Migrations
 
             modelBuilder.Entity("RaffleKing.Data.Models.PrizeModel", b =>
                 {
-                    b.Property<int>("PrizeId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PrizeId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -336,7 +336,7 @@ namespace RaffleKing.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
-                    b.HasKey("PrizeId");
+                    b.HasKey("Id");
 
                     b.HasIndex("DrawId");
 
@@ -409,7 +409,7 @@ namespace RaffleKing.Migrations
                 {
                     b.HasOne("RaffleKing.Data.Models.DrawModel", "Draw")
                         .WithMany("Entries")
-                        .HasForeignKey("Id")
+                        .HasForeignKey("DrawId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

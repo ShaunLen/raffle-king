@@ -187,7 +187,7 @@ namespace RaffleKing.Migrations
                 name: "Prize",
                 columns: table => new
                 {
-                    PrizeId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
@@ -196,7 +196,7 @@ namespace RaffleKing.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Prize", x => x.PrizeId);
+                    table.PrimaryKey("PK_Prize", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Prize_Draw_DrawId",
                         column: x => x.DrawId,
@@ -209,9 +209,9 @@ namespace RaffleKing.Migrations
                 name: "Entry",
                 columns: table => new
                 {
-                    EntryId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Id = table.Column<int>(type: "int", nullable: false),
+                    DrawId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     IsGuest = table.Column<bool>(type: "bit", nullable: false),
                     GuestEmail = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
@@ -222,15 +222,15 @@ namespace RaffleKing.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Entry", x => x.EntryId);
+                    table.PrimaryKey("PK_Entry", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Entry_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Entry_Draw_Id",
-                        column: x => x.Id,
+                        name: "FK_Entry_Draw_DrawId",
+                        column: x => x.DrawId,
                         principalTable: "Draw",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -238,7 +238,7 @@ namespace RaffleKing.Migrations
                         name: "FK_Entry_Prize_PrizeId",
                         column: x => x.PrizeId,
                         principalTable: "Prize",
-                        principalColumn: "PrizeId");
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -286,9 +286,9 @@ namespace RaffleKing.Migrations
                 column: "DrawHostId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Entry_Id",
+                name: "IX_Entry_DrawId",
                 table: "Entry",
-                column: "Id");
+                column: "DrawId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Entry_PrizeId",
