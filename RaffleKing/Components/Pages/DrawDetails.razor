@@ -1,0 +1,107 @@
+﻿@page "/draws/draw-details/{drawId:int}"
+@inject IDrawService DrawService
+@inject IPrizeService PrizeService
+
+<PageTitle>Draw Details</PageTitle>
+
+<MudStack Justify="Justify.Center" Spacing="6">
+    @* TODO: Pass return url as param *@
+    <MudButton StartIcon="@Icons.Material.Filled.ArrowBack">Return to TODO</MudButton>
+    <MudText Typo="Typo.h1" Color="@Color.Tertiary" Align="Align.Center">@_draw?.Title</MudText>
+    <MudGrid Justify="Justify.Center" Spacing="0">
+        <MudItem>
+            <MudContainer MaxWidth="MaxWidth.Small">
+                <MudText Typo="Typo.h6" Color="Color.Primary">ABOUT THE RAFFLE</MudText>
+                <MudPaper Class="pa-4 border-t-2 mud-border-primary">
+                    <MudText Typo="Typo.body1">@_draw?.Description</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Tertiary" Class="mt-2">
+                        @* TODO: Display actual prize account and change text depending on IsBundle *@
+                        Winners will be drawn automatically at the scheduled time. There are a total of X prizes in
+                        this raffle to be won by X individual winners.
+                    </MudText>
+                </MudPaper>
+            </MudContainer>
+        </MudItem>
+        <MudItem>
+            <MudStack>
+                <MudContainer MaxWidth="MaxWidth.ExtraSmall">
+                    <MudText Typo="Typo.h6" Color="Color.Primary" Align="Align.Center">
+                        DRAW DETAILS
+                    </MudText>
+                    <MudPaper Class="pa-4 border-t-2 mud-border-primary">
+                        <MudGrid Justify="Justify.Center">
+                            <MudItem>
+                                <MudStack AlignItems="AlignItems.Center" Spacing="0">
+                                    <MudIcon Icon="@Icons.Material.Filled.AccountCircle" Size="Size.Large" Class="mb-2"/>
+                                    <MudText Typo="Typo.button" Align="Align.Center" Style="line-height: 1.2">
+                                        @_draw?.MaxEntriesPerUser max<br/>per person
+                                    </MudText>
+                                </MudStack>
+                            </MudItem>
+                            <MudItem>
+                                <MudStack AlignItems="AlignItems.Center" Spacing="0">
+                                    <MudIcon Icon="@Icons.Material.Filled.CalendarMonth" Size="Size.Large" Class="mb-2"/>
+                                    <MudText Typo="Typo.button" Align="Align.Center" Style="line-height: 1.2">
+                                        Draw date:<br/>@_draw?.DrawDate.ToShortDateString()
+                                    </MudText>
+                                </MudStack>
+                            </MudItem>
+                            <MudItem>
+                                <MudStack AlignItems="AlignItems.Center" Spacing="0">
+                                    <MudIcon Icon="@Icons.Material.Filled.LocalActivity" Size="Size.Large" Class="mb-2"/>
+                                    <MudText Typo="Typo.button" Align="Align.Center" Style="line-height: 1.2">
+                                         @_draw?.MaxEntriesTotal<br/>total tickets
+                                    </MudText>
+                                </MudStack>
+                            </MudItem>
+                        </MudGrid>
+                    </MudPaper>
+                </MudContainer>
+                <MudContainer MaxWidth="MaxWidth.ExtraSmall">
+                    <MudText Typo="Typo.h6" Color="Color.Primary" Align="Align.Center">
+                        ENTER DRAW
+                    </MudText>
+                    <MudPaper Class="pa-4 border-t-2 mud-border-primary">
+                        <MudText Typo="Typo.button" Color="Color.Info">50% Total Entries Remaining</MudText>
+                        <MudProgressLinear Striped="true" Color="Color.Info" Size="Size.Large" Value="50" Class="mt-0"/>
+                        <MudText Typo="Typo.body1" Color="Color.Info" Class="mt-2">
+                            You have entered this draw X times.
+                        </MudText>
+                        <MudSelect T="int" Label="Entries" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter"
+                                   Immediate="true" Value="1" Class="mt-4">
+                            @* TODO: Display available lucky numbers for lotteries *@
+                            @for (var i = 1; i <= _availableEntries; i++)
+                            {
+                                <MudSelectItem Value="i"/>
+                            }
+                        </MudSelect>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Class="mt-4">
+                            Enter Draw
+                        </MudButton>
+                    </MudPaper>
+                </MudContainer>
+            </MudStack>
+        </MudItem>
+    </MudGrid>
+    <MudStack Justify="Justify.Center">
+        <MudText Typo="Typo.h6" Color="Color.Primary" Align="Align.Center">
+            AVAILABLE PRIZES
+        </MudText>
+        @* TODO: Display actual prizes *@
+        <MudGrid Justify="Justify.Center">
+            @if (_prizes != null)
+            {
+                foreach (var prize in _prizes)
+                {
+                    <MudItem>
+                        <MudPaper Class="pa-4 border-t-2 mud-border-primary">
+                            <MudText Typo="Typo.h6" Color="Color.Tertiary">@prize.Title</MudText>
+                            <MudText Typo="Typo.body1">@prize.Description</MudText>
+                            <MudText Typo="Typo.button" Color="Color.Primary">Quantity: @prize.Quantity</MudText>
+                        </MudPaper>
+                    </MudItem>
+                }
+            }
+        </MudGrid>
+    </MudStack>
+</MudStack>
