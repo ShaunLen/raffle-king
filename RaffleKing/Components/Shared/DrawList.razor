@@ -32,8 +32,7 @@
                         @foreach (var draw in _draws.Where(
                                       draw => draw is { DrawType: DrawTypeEnum.Raffle, IsActive: true }))
                         {
-                            <DrawCard Title="@draw.Title" Description="@draw.Description" ListType="@ListType"
-                                      DrawDateTime="@draw.DrawDate"/>
+                            <DrawCard DrawId="draw.Id" ListType="@ListType"/>
                         }
                     </MudStack>
                 </MudItem>
@@ -47,8 +46,7 @@
                         @foreach (var draw in _draws.Where(
                                       draw => draw is { DrawType: DrawTypeEnum.Lottery, IsActive: true }))
                         {
-                            <DrawCard Title="@draw.Title" Description="@draw.Description" ListType="@ListType"
-                                      DrawDateTime="@draw.DrawDate"/>
+                            <DrawCard DrawId="draw.Id" ListType="@ListType"/>
                         }
                     </MudStack>
                 </MudItem>
@@ -64,8 +62,7 @@
                             @foreach (var draw in _draws.Where(
                                           draw => draw is { DrawType: DrawTypeEnum.Raffle, IsActive: false }))
                             {
-                                <DrawCard Title="@draw.Title" Description="@draw.Description" ListType="@ListType"
-                                          DrawDateTime="@draw.DrawDate"/>
+                                <DrawCard DrawId="draw.Id" ListType="@ListType"/>
                             }
                         </MudStack>
                     </MudItem>
@@ -79,8 +76,7 @@
                             @foreach (var draw in _draws.Where(
                                           draw => draw is { DrawType: DrawTypeEnum.Lottery, IsActive: false }))
                             {
-                                <DrawCard Title="@draw.Title" Description="@draw.Description" ListType="@ListType"
-                                          DrawDateTime="@draw.DrawDate"/>
+                                <DrawCard DrawId="draw.Id" ListType="@ListType"/>
                             }
                         </MudStack>
                     </MudItem>

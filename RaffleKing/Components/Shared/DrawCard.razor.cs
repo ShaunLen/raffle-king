@@ -7,42 +7,35 @@ namespace RaffleKing.Components.Shared;
 public partial class DrawCard
 {
     /// <summary>
-    /// The title of the draw.
+    /// The Id of the Draw.
     /// </summary>
-    [Parameter] public string Title { get; set; } = "Missing Title";
-    
-    /// <summary>
-    /// The description of the draw, first 100 characters will be used if exceeded.
-    /// </summary>
-    [Parameter] public string Description { get; set; } = "Missing description.";
+    [Parameter] public int DrawId { get; set; }
     
     /// <summary>
     /// The type of list the DrawCard will be displayed in (Active/Hosted/Entered).
     /// </summary>
     [Parameter] public DrawListType ListType { get; set; }
-    
-    /// <summary>
-    /// The date/time that winners will be drawn.
-    /// </summary>
-    [Parameter] public DateTime DrawDateTime { get; set; }
 
     // Private fields
+    private DrawModel? _draw;
+    private string? _description;
     private string? _buttonText;
     private string? _dateString;
     private bool _expired;
     private Color _dateColor;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        _dateString = GetFormattedDate(DrawDateTime);
-        _expired = DrawDateTime < DateTime.Now;
+        _draw = await DrawService.GetDrawById(DrawId);
+
+        if (_draw is null) return;
+        
+        _dateString = GetFormattedDate(_draw.DrawDate);
+        _expired = _draw.DrawDate < DateTime.Now;
         _dateColor = _expired ? Color.Error : Color.Info;
         
         // Restrict description displayed to 100 characters.
-        if (Description.Length > 100)
-        {
-            Description = $"{Description[..100]}...";
-        }
+        _description = _draw.Description.Length > 100 ? $"{_draw.Description[..100]}..." : _draw.Description;
 
         // Conditional text for the button on the card
         _buttonText = ListType switch
