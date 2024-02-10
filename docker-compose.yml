@@ -1,0 +1,24 @@
+﻿services:
+  raffleking:
+    image: raffleking
+    build:
+      context: .
+      dockerfile: RaffleKing/Dockerfile
+    ports:
+      - 8001:8080
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    depends_on: 
+      - db
+  db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=CM4025secure123!
+    ports:
+      - 8002:1433
+    volumes:
+      - sql_data:/var/opt/mssql
+    
+volumes: 
+  sql_data:
