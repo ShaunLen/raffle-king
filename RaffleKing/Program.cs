@@ -85,6 +85,16 @@ app.MapAdditionalIdentityEndpoints();
 
 app.MapAccountServices();
 
+// Automatically apply migrations and create the database at startup
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var dbContext = services.GetRequiredService<ApplicationDbContext>();
+    
+    // Not async to ensure application does not start until database is ready
+    dbContext.Database.Migrate();
+}
+
 // Set up Identity roles
 using (var scope = app.Services.CreateScope())
 {
