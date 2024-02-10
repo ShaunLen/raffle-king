@@ -10,7 +10,7 @@ public class EntryModel
     /// </summary>
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int EntryId { get; private init; }
+    public int Id { get; private init; }
 
     /// <summary>
     /// The identifier of the associated draw.

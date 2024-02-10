@@ -10,7 +10,7 @@ public class PrizeModel
     /// </summary>
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int PrizeId { get; private init; }
+    public int Id { get; private init; }
 
     /// <summary>
     /// The title of the prize, up to 30 characters.
