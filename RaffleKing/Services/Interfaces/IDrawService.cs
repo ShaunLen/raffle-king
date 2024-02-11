@@ -5,7 +5,7 @@ namespace RaffleKing.Services.Interfaces;
 public interface IDrawService
 {
     /* Create Operations */
-    public Task AddNewDraw(DrawModel drawModel);
+    public Task<int> AddNewDraw(DrawModel drawModel);
     
     /* Read Operations */
     public Task<DrawModel?> GetDrawById(int drawId);

@@ -9,11 +9,12 @@ namespace RaffleKing.Services;
 public class DrawService(IDbContextFactory<ApplicationDbContext> factory, IHttpContextAccessor httpContextAccessor) : IDrawService
 {
     /* Create Operations */
-    public async Task AddNewDraw(DrawModel drawModel)
+    public async Task<int> AddNewDraw(DrawModel drawModel)
     {
         await using var context = await factory.CreateDbContextAsync();
         context.Draws.Add(drawModel);
         await context.SaveChangesAsync();
+        return drawModel.Id;
     }
 
     /* Read Operations */
