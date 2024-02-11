@@ -3,14 +3,14 @@
     <MudNavGroup Title="Draws" @bind-Expanded="_isRafflesExpanded" @bind-HideExpandIcon="IsDrawerClosed"
                  Icon="@Icons.Material.Filled.LocalActivity">
         <AuthorizeView Roles="Host, Admin">
-            <MudNavLink Href="/draws/my-draws" Match="NavLinkMatch.All" Icon="@Icons.Custom.Uncategorized.ChessQueen">
+            <MudNavLink Href="/draws/my-draws" Match="NavLinkMatch.Prefix" Icon="@Icons.Custom.Uncategorized.ChessQueen">
                 My Draws
             </MudNavLink>
         </AuthorizeView>
-        <MudNavLink Href="/draws/active-draws" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Start">
+        <MudNavLink Href="/draws/active-draws" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Start">
             Active Draws
         </MudNavLink>
-        <MudNavLink Href="/draws/entered-draws" Match="NavLinkMatch.All" Icon="@Icons.Custom.Uncategorized.ChessKnight">
+        <MudNavLink Href="/draws/entered-draws" Match="NavLinkMatch.Prefix" Icon="@Icons.Custom.Uncategorized.ChessKnight">
             Entered Draws
         </MudNavLink>
     </MudNavGroup>
