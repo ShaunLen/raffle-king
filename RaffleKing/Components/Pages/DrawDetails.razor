@@ -1,12 +1,15 @@
 ﻿@page "/draws/draw-details/{drawId:int}"
 @inject IDrawService DrawService
 @inject IPrizeService PrizeService
+@inject NavigationManager NavigationManager
 
 <PageTitle>Draw Details</PageTitle>
 
 <MudStack Justify="Justify.Center" Spacing="6">
     @* TODO: Pass return url as param *@
-    <MudButton StartIcon="@Icons.Material.Filled.ArrowBack">Return to TODO</MudButton>
+    <MudButton OnClick="@(() => NavigationManager.NavigateTo("javascript:history.back()"))" StartIcon="@Icons.Material.Filled.ArrowBack">
+        Go Back
+    </MudButton>
     <MudText Typo="Typo.h1" Color="@Color.Tertiary" Align="Align.Center">@_draw?.Title</MudText>
     <MudGrid Justify="Justify.Center" Spacing="0">
         <MudItem>
