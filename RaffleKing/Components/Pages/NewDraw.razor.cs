@@ -44,8 +44,9 @@ public partial class NewDraw
             
         try
         {
-            await DrawService.AddNewDraw(newDraw);
+            var drawId = await DrawService.AddNewDraw(newDraw);
             Snackbar.Add("Draw created successfully.", Severity.Success);
+            NavigationManager.NavigateTo($"/draws/draw-details/{drawId}");
         }
         catch (Exception exception)
         {
