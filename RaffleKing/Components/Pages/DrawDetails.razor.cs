@@ -1,12 +1,15 @@
 ﻿using System.Text;
 using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Primitives;
+using MudBlazor;
 using RaffleKing.Data.Models;
 
 namespace RaffleKing.Components.Pages;
 
 public partial class DrawDetails
 {
+    /// <summary>
+    /// The Id of the draw to be displayed.
+    /// </summary>
     [Parameter]
     public int DrawId { get; set; }
 
@@ -15,7 +18,7 @@ public partial class DrawDetails
     private int _availableEntries;
     private List<int>? _availableLuckyNumbers;
     private string? _detailsText;
-    
+    private bool _userIsHost;
 
     protected override async Task OnInitializedAsync()
     {
@@ -24,6 +27,30 @@ public partial class DrawDetails
         _availableEntries = GetAvailableEntries();
         _detailsText = GetDetailsText();
         _availableLuckyNumbers = GetAvailableLuckyNumbers();
+        
+        // Check whether the currently logged in user is the host of this draw
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity is { IsAuthenticated: true })
+        {
+            _userIsHost = _draw?.DrawHostId == user.FindFirst(
+                System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // If draw has just been published, display snackbar to notify host
+            var drawPublished = await LocalStorage.GetItemAsync<bool>("DrawPublished");
+            if (drawPublished)
+            {
+                Snackbar.Add("Draw has been published!", Severity.Success);
+                await LocalStorage.RemoveItemAsync("DrawPublished");
+            }
+        }
     }
 
     /// <summary>
@@ -33,6 +60,7 @@ public partial class DrawDetails
     /// <returns>Maximum available entries.</returns>
     private int GetAvailableEntries()
     {
+        // TODO: Get actual available entries
         if (_draw is null) return 0;
         
         return _draw.MaxEntriesPerUser;
@@ -48,7 +76,7 @@ public partial class DrawDetails
         
         for (var i = 1; i < 100; i++)
         {
-            // Temporarily just add all lucky numbers until entry logic is added
+            // Temporarily just add max range of lucky numbers until entry logic is added
             availableLuckyNumbers.Add(i);
         }
 
@@ -70,15 +98,71 @@ public partial class DrawDetails
 
         if (_draw is { IsBundle: true })
         {
-            text.Append($"This {_draw?.DrawType.ToString()} is a bundle, so a single winner will be drawn as the" +
-                        $" recipient of all {numberOfPrizes} prizes.");
+            if (_draw.DrawType == DrawTypeEnum.Raffle)
+            {
+                text.Append("This Raffle is a bundle, so a single winner will be drawn as the recipient of all " +
+                            "prizes - each entry gives you 1 chance to win.");
+            }
+            else
+            {
+                text.Append("This Lottery is a bundle, so a single lucky number will be drawn as the recipient of " +
+                            "all prizes - each entry gives you 1 chance to win.");
+            }
         }
         else
         {
-            text.Append($"An individual winner will be drawn for each prize in this {_draw?.DrawType.ToString()}, " +
+            text.Append($"A lucky number will be drawn for each prize in this {_draw?.DrawType.ToString()}, " +
                         $"so each entry gives you {numberOfPrizes} chances to win!");
         }
-        
+
         return text.ToString();
+    }
+
+    /// <summary>
+    /// Displays a dialog requiring confirmation before publishing the draw. Once confirmed, the draw is published
+    /// and the page is reloaded.
+    /// </summary>
+    private async Task PublishDrawWithConfirmation()
+    {
+        // Display confirmation dialog
+        var result = await DialogService.ShowMessageBox(
+            "Publish Draw",
+            "Once published, the draw will no longer be editable and will be open to entries. Are you sure?",
+            yesText: "Publish", cancelText: "Cancel");
+        
+        if (result == null) return;
+
+        await DrawService.ActivateDraw(DrawId);
+        await LocalStorage.SetItemAsync("DrawPublished", true);
+        NavigationManager.NavigateTo(NavigationManager.Uri, true);
+    }
+    
+    /// <summary>
+    /// Displays a dialog requiring confirmation before deleting the draw. Once confirmed, the draw is deleted along
+    /// with any linked prizes and entries and the user is navigated to <i>/draws/my-draws</i>.
+    /// </summary>
+    private async Task DeleteDrawWithConfirmation()
+    {
+        // Display confirmation dialog
+        var result = await DialogService.ShowMessageBox(
+            "Delete Draw",
+            "Deletion is permanent! All associated prizes and entries will also be lost and no winners " +
+            "will be drawn. Are you sure?",
+            yesText: "Delete", cancelText: "Cancel");
+
+        if (result == null) return;
+
+        // Delete all prizes associated with this draw
+        if (_prizes != null)
+            foreach (var prize in _prizes)
+            {
+                await PrizeService.DeletePrize(prize.Id);
+            }
+        
+        // TODO: Delete all associated entries 
+
+        await DrawService.DeleteDraw(DrawId);
+        NavigationManager.NavigateTo("/draws/my-draws");
+        Snackbar.Add("Draw deleted successfully", Severity.Success);
     }
 }
