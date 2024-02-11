@@ -45,6 +45,7 @@
             <MudDivider Vertical="true" Class="my-4 ml-2" FlexItem="true"></MudDivider>
             @if (!_isAccountPage)
             {
+                <MudIconButton Icon="@Icons.Material.Filled.Notifications"/>
                 <MudToggleIconButton @bind-Toggled="@_isDarkModeActive" Icon="@Icons.Material.Filled.LightMode"
                                      ToggledIcon="@Icons.Material.Filled.DarkMode"></MudToggleIconButton>
             }
