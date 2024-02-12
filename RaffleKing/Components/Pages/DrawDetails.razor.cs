@@ -51,6 +51,22 @@ public partial class DrawDetails
                 Snackbar.Add("Draw has been published!", Severity.Success);
                 await LocalStorage.RemoveItemAsync("DrawPublished");
             }
+            
+            // If a prize has just been added, display snackbar to notify host
+            var prizeAdded = await LocalStorage.GetItemAsync<bool>("PrizeAdded");
+            if (prizeAdded)
+            {
+                Snackbar.Add("Prize has been added!", Severity.Success);
+                await LocalStorage.RemoveItemAsync("PrizeAdded");
+            }
+            
+            // If a prize has just been deleted, display snackbar to notify host
+            var prizeDeleted = await LocalStorage.GetItemAsync<bool>("PrizeDeleted");
+            if (prizeDeleted)
+            {
+                Snackbar.Add("Prize has been deleted!", Severity.Success);
+                await LocalStorage.RemoveItemAsync("PrizeDeleted");
+            }
         }
     }
 
@@ -147,7 +163,7 @@ public partial class DrawDetails
         // Display confirmation dialog
         var result = await DialogService.ShowMessageBox(
             "Delete Draw",
-            "Deletion is permanent! All associated prizes and entries will also be lost and no winners " +
+            "Deletion is permanent! All associated prizes and entries will also be deleted and no winners " +
             "will be drawn. Are you sure?",
             yesText: "Delete", cancelText: "Cancel");
 
@@ -166,6 +182,24 @@ public partial class DrawDetails
         NavigationManager.NavigateTo("/draws/my-draws");
         Snackbar.Add("Draw deleted successfully", Severity.Success);
     }
+    
+    /// <summary>
+    /// Displays a dialog requiring confirmation before deleting the prize. Once confirmed, the prize is deleted.
+    /// </summary>
+    private async Task DeletePrizeWithConfirmation(int prizeId)
+    {
+        // Display confirmation dialog
+        var result = await DialogService.ShowMessageBox(
+            "Delete Prize",
+            "Deletion is permanent! Are you sure?",
+            yesText: "Delete", cancelText: "Cancel");
+
+        if (result == null) return;
+
+        await PrizeService.DeletePrize(prizeId);
+        await LocalStorage.SetItemAsync("PrizeDeleted", true);
+        NavigationManager.NavigateTo(NavigationManager.Uri, true);
+    }
 
     private async Task AddPrize()
     {
@@ -179,6 +213,8 @@ public partial class DrawDetails
         if (!result.Canceled)
         {
             if (result.Data is PrizeModel prize) await PrizeService.AddNewPrize(prize);
+            await LocalStorage.SetItemAsync("PrizeAdded", true);
+            NavigationManager.NavigateTo(NavigationManager.Uri, true);
         }
     }
 }

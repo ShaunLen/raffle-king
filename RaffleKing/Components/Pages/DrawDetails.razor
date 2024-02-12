@@ -156,9 +156,24 @@
                             <MudText Typo="Typo.h6" Color="Color.Tertiary">@prize.Title</MudText>
                             <MudText Typo="Typo.body1">@prize.Description</MudText>
                             <MudText Typo="Typo.button" Color="Color.Primary">Quantity: @prize.Quantity</MudText>
+                            @if (_draw is { IsActive: false })
+                            {
+                                <MudButton Color="Color.Error" Class="pa-0 ml-2"
+                                           OnClick="@(async (e) =>
+                                                        await DeletePrizeWithConfirmation(prize.Id))">
+                                    Delete Prize
+                                </MudButton>
+                            }
                         </MudPaper>
                     </MudItem>
                 }
+            }
+            @if (_prizes == null || _prizes.Count == 0)
+            {
+                <MudText Typo="Typo.h6" Align="Align.Center">
+                    This @_draw?.DrawType.ToString() does not have any associated prizes. At least one prize must be
+                    added before it can be published.
+                </MudText>
             }
         </MudGrid>
     </MudStack>
