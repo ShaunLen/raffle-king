@@ -1,0 +1,23 @@
+﻿@inject IPrizeService PrizeService
+@inject IDrawService DrawService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <div class="d-flex flex-column py-1">
+            <MudForm>
+                <MudTextField T="string" @bind-Value="_title" Label="Title" Required="true" Immediate="true"
+                              RequiredError="Title is required!" MaxLength="30" Counter="30" AutoFocus="true"/>
+                <MudTextField T="string" @bind-Value="_description" Label="Description" Required="true"
+                              RequiredError="Description is required!"MaxLength="500" Counter="500"
+                              Immediate="true" AutoGrow="true" HelperText=""/>
+                <MudNumericField @bind-Value="_quantity" Label="Quantity" Variant="Variant.Text"
+                                 Min="1" Max="99"/>
+            </MudForm>
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="@CreatePrize">Add Prize</MudButton>
+    </DialogActions>
+</MudDialog>

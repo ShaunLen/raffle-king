@@ -36,10 +36,13 @@
                 <MudPaper Class="pa-4 border-t-2 mud-border-primary">
                     <MudText Typo="Typo.body1">@_draw?.Description</MudText>
                     <MudText Typo="Typo.body2" Color="Color.Tertiary" Class="mt-2">@_detailsText</MudText>
-                    <MudText Typo="Typo.body2" Color="Color.Tertiary" Class="mt-2">
-                        In a Lottery, there is no guarantee of a winner. Any lucky number may be drawn, even if that
-                        lucky number has not been selected. In such a case, the prize will not be won by anyone.
-                    </MudText>
+                    @if (_draw?.DrawType == DrawTypeEnum.Lottery)
+                    {
+                        <MudText Typo="Typo.body2" Color="Color.Tertiary" Class="mt-2">
+                            In a Lottery, there is no guarantee of a winner. Any lucky number may be drawn, even if that
+                            lucky number has not been selected. In such a case, the prize will not be won by anyone.
+                        </MudText>
+                    }
                 </MudPaper>
             </MudContainer>
         </MudItem>
@@ -88,13 +91,14 @@
                         {
                             @if (_draw is { IsActive: false })
                             {
-                                <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true">
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Class="mb-4"
+                                           OnClick="@AddPrize">
                                     Add Prize
                                 </MudButton>
                             }
                             @if (_prizes is { Count: > 0 } && _draw is { IsActive: false })
                             {
-                                <MudButton Variant="Variant.Filled" Color="Color.Info" FullWidth="true" Class="my-4"
+                                <MudButton Variant="Variant.Filled" Color="Color.Info" FullWidth="true" Class="mb-4"
                                            OnClick="@PublishDrawWithConfirmation">
                                     Publish Draw
                                 </MudButton>

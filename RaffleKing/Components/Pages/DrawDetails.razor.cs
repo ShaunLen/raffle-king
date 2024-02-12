@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using RaffleKing.Components.Shared;
 using RaffleKing.Data.Models;
 
 namespace RaffleKing.Components.Pages;
@@ -164,5 +165,20 @@ public partial class DrawDetails
         await DrawService.DeleteDraw(DrawId);
         NavigationManager.NavigateTo("/draws/my-draws");
         Snackbar.Add("Draw deleted successfully", Severity.Success);
+    }
+
+    private async Task AddPrize()
+    {
+        var parameters = new DialogParameters
+        {
+            { "DrawId", DrawId }
+        };
+        var dialog = await DialogService.ShowAsync<AddPrize>("Add Prize", parameters);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            if (result.Data is PrizeModel prize) await PrizeService.AddNewPrize(prize);
+        }
     }
 }
