@@ -1,16 +1,12 @@
-﻿using Microsoft.AspNetCore.WebUtilities;
-using MudBlazor;
-
-namespace RaffleKing.Components.Pages;
+﻿namespace RaffleKing.Components.Pages;
 
 public partial class Home
 {
-    protected override void OnInitialized()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("from", out var from) && from == "logout")
+        if (firstRender)
         {
-            Snackbar.Add("Logged out successfully.", Severity.Success);
+            await SnackbarHelper.DisplayPendingSnackbarMessages();
         }
     }
 }

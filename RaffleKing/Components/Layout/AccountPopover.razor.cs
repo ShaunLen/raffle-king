@@ -9,6 +9,7 @@ public partial class AccountPopover
     
     private void Logout()
     {
+        SnackbarHelper.QueueSnackbarMessageForReload("LoggedOut", "Logged out successfully.");
         NavigationManager.NavigateTo("/Logout", true);
     }
 }
