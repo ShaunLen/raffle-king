@@ -47,6 +47,9 @@ builder.Services.AddScoped<IDrawService, DrawService>();
 builder.Services.AddScoped<IPrizeService, PrizeService>();
 builder.Services.AddScoped<IEntryService, EntryService>();
 
+// Add helper services
+builder.Services.AddScoped<ISnackbarHelper, SnackbarHelper>();
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
                        throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
