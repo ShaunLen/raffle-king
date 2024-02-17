@@ -2,11 +2,12 @@
 @using RaffleKing.Data.Models
 @inject IDrawService DrawService
 @inject IPrizeService PrizeService
+@inject IEntryService EntryService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject ILocalStorageService LocalStorage
+@inject ISnackbarHelper SnackbarHelper
 
 <PageTitle>Draw Details</PageTitle>
 
@@ -110,32 +111,50 @@
                         }
                         else
                         {
-                            <MudText Typo="Typo.button" Color="Color.Info">50% Total Entries Remaining</MudText>
-                            <MudProgressLinear Striped="true" Color="Color.Info" Size="Size.Large" Value="50" Class="mt-0"/>
-                            <MudText Typo="Typo.body1" Color="Color.Info" Class="mt-2">
-                                You have entered this draw X times.
+                            <MudText Typo="Typo.button" Color="Color.Info">@_percentageEntriesRemaining% Total Entries Remaining</MudText>
+                            <MudProgressLinear Striped="true" Color="Color.Info" Size="Size.Large" Class="mt-0"
+                                               Value="@_percentageEntriesRemaining"/>
+                            <MudText Typo="Typo.body1" Color="Color.Primary" Class="mt-2">
+                                You have entered this draw @_userEntries?.Count times.
                             </MudText>
-                            <MudSelect T="int" Label="@(_draw?.DrawType == DrawTypeEnum.Raffle ? "Entries" : "Lucky Numbers")"
-                                       Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter" Immediate="true"
-                                       MultiSelection="@(_draw?.DrawType == DrawTypeEnum.Lottery)" Value="1" Class="mt-4">
+                            @if (_availableEntries != 0)
+                            {
                                 @if (_draw?.DrawType == DrawTypeEnum.Raffle)
                                 {
-                                    @for (var i = 1; i <= _availableEntries; i++)
-                                    {
-                                        <MudSelectItem Value="i"/>
-                                    }
+                                    <MudSelect T="int" Label="Entries" Variant="Variant.Filled" Class="mt-4"
+                                               AnchorOrigin="Origin.BottomCenter" Immediate="true"
+                                               @bind-Value="_selectedNumberOfEntries">
+                                            @for (var i = 1; i <= _availableEntries; i++)
+                                            {
+                                                <MudSelectItem Value="i"/>
+                                            }
+                                    </MudSelect>
                                 }
-                                else if (_availableLuckyNumbers != null)
+                                else
                                 {
-                                    foreach (var luckyNumber in _availableLuckyNumbers)
-                                    {
-                                        <MudSelectItem Value="luckyNumber"/>
-                                    }
+                                    <MudSelect T="int" Label="Lucky Numbers" Variant="Variant.Filled" Value="1" Class="mt-4"
+                                               AnchorOrigin="Origin.BottomCenter" Immediate="true" MultiSelection="true">
+                                        @if (_availableLuckyNumbers != null)
+                                        {
+                                            foreach (var luckyNumber in _availableLuckyNumbers)
+                                            {
+                                                <MudSelectItem Value="luckyNumber"/>
+                                            }
+                                        }
+                                    </MudSelect>
                                 }
-                            </MudSelect>
-                            <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Class="mt-4">
-                                Enter Draw
-                            </MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Class="mt-4"
+                                           OnClick="@EnterDrawAsUser">
+                                    Enter Draw
+                                </MudButton>
+                            }
+                            if (_userEntries is { Count: > 0 })
+                            {
+                                <MudButton Variant="Variant.Filled" Color="Color.Error" FullWidth="true" Class="mt-4"
+                                           OnClick="@RemoveUserEntriesWithConfirmation">
+                                    Remove Entries
+                                </MudButton>
+                            }
                         }
                     </MudPaper>
                 </MudContainer>

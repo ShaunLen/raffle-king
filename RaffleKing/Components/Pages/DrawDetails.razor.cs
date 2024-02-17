@@ -16,18 +16,19 @@ public partial class DrawDetails
 
     private DrawModel? _draw;
     private List<PrizeModel>? _prizes;
+    private List<EntryModel>? _allEntries;
+    private List<EntryModel>? _userEntries;
     private int _availableEntries;
     private List<int>? _availableLuckyNumbers;
     private string? _detailsText;
     private bool _userIsHost;
+    private double _percentageEntriesRemaining;
+    private int _selectedNumberOfEntries = 1;
+    private IEnumerable<int> _selectedLuckyNumbers = new List<int>();
 
     protected override async Task OnInitializedAsync()
     {
-        _draw = await DrawService.GetDrawById(DrawId);
-        _prizes = await PrizeService.GetPrizesForDraw(DrawId);
-        _availableEntries = GetAvailableEntries();
-        _detailsText = GetDetailsText();
-        _availableLuckyNumbers = GetAvailableLuckyNumbers();
+        await FetchFreshData();
         
         // Check whether the currently logged in user is the host of this draw
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -43,31 +44,25 @@ public partial class DrawDetails
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
-        {
-            // If draw has just been published, display snackbar to notify host
-            var drawPublished = await LocalStorage.GetItemAsync<bool>("DrawPublished");
-            if (drawPublished)
-            {
-                Snackbar.Add("Draw has been published!", Severity.Success);
-                await LocalStorage.RemoveItemAsync("DrawPublished");
-            }
-            
-            // If a prize has just been added, display snackbar to notify host
-            var prizeAdded = await LocalStorage.GetItemAsync<bool>("PrizeAdded");
-            if (prizeAdded)
-            {
-                Snackbar.Add("Prize has been added!", Severity.Success);
-                await LocalStorage.RemoveItemAsync("PrizeAdded");
-            }
-            
-            // If a prize has just been deleted, display snackbar to notify host
-            var prizeDeleted = await LocalStorage.GetItemAsync<bool>("PrizeDeleted");
-            if (prizeDeleted)
-            {
-                Snackbar.Add("Prize has been deleted!", Severity.Success);
-                await LocalStorage.RemoveItemAsync("PrizeDeleted");
-            }
-        }
+            await SnackbarHelper.DisplayPendingSnackbarMessages();
+    }
+    
+    /// <summary>
+    /// Updates local fields with fresh information from the database. It is important to do this before performing
+    /// any action that relies on this data, to ensure the data is not outdated by the time it is used in checks.
+    /// </summary>
+    private async Task FetchFreshData()
+    {
+        _draw = await DrawService.GetDrawById(DrawId);
+        _prizes = await PrizeService.GetPrizesForDraw(DrawId);
+        _allEntries = await EntryService.GetEntriesForDraw(DrawId);
+        _userEntries = await EntryService.GetEntriesForDrawByUser(DrawId);
+        _availableEntries = GetAvailableEntries();
+        _availableLuckyNumbers = GetAvailableLuckyNumbers();
+        _detailsText = GetDetailsText();
+        
+        if(_allEntries != null && _draw != null)
+            _percentageEntriesRemaining = Math.Round(100 - (float)_allEntries.Count / _draw.MaxEntriesTotal * 100);
     }
 
     /// <summary>
@@ -77,10 +72,12 @@ public partial class DrawDetails
     /// <returns>Maximum available entries.</returns>
     private int GetAvailableEntries()
     {
-        // TODO: Get actual available entries
         if (_draw is null) return 0;
+
+        if (_userEntries != null && _allEntries != null)
+                return Math.Min(_draw.MaxEntriesPerUser - _userEntries.Count, _draw.MaxEntriesTotal - _allEntries.Count);
         
-        return _draw.MaxEntriesPerUser;
+        return 0;
     }
 
     /// <summary>
@@ -150,7 +147,7 @@ public partial class DrawDetails
         if (result == null) return;
 
         await DrawService.ActivateDraw(DrawId);
-        await LocalStorage.SetItemAsync("DrawPublished", true);
+        await SnackbarHelper.QueueSnackbarMessageForReload("DrawPublished", "Draw has been published!");
         NavigationManager.NavigateTo(NavigationManager.Uri, true);
     }
     
@@ -160,6 +157,8 @@ public partial class DrawDetails
     /// </summary>
     private async Task DeleteDrawWithConfirmation()
     {
+        await FetchFreshData();
+        
         // Display confirmation dialog
         var result = await DialogService.ShowMessageBox(
             "Delete Draw",
@@ -172,11 +171,12 @@ public partial class DrawDetails
         // Delete all prizes associated with this draw
         if (_prizes != null)
             foreach (var prize in _prizes)
-            {
                 await PrizeService.DeletePrize(prize.Id);
-            }
         
-        // TODO: Delete all associated entries 
+        // Delete all entries associated with this draw
+        if(_allEntries != null)
+            foreach (var entry in _allEntries)
+                await EntryService.DeleteEntry(entry.Id);
 
         await DrawService.DeleteDraw(DrawId);
         NavigationManager.NavigateTo("/draws/my-draws");
@@ -197,10 +197,14 @@ public partial class DrawDetails
         if (result == null) return;
 
         await PrizeService.DeletePrize(prizeId);
-        await LocalStorage.SetItemAsync("PrizeDeleted", true);
+        await SnackbarHelper.QueueSnackbarMessageForReload("PrizeDeleted", "Prize has been deleted!");
         NavigationManager.NavigateTo(NavigationManager.Uri, true);
     }
 
+    /// <summary>
+    /// Displays a dialog where details of the prize should be entered. Once confirmed, the new prize is added to the
+    /// draw.
+    /// </summary>
     private async Task AddPrize()
     {
         var parameters = new DialogParameters
@@ -213,8 +217,101 @@ public partial class DrawDetails
         if (!result.Canceled)
         {
             if (result.Data is PrizeModel prize) await PrizeService.AddNewPrize(prize);
-            await LocalStorage.SetItemAsync("PrizeAdded", true);
+            await SnackbarHelper.QueueSnackbarMessageForReload("PrizeAdded", "Prize has been added!");
             NavigationManager.NavigateTo(NavigationManager.Uri, true);
         }
+    }
+    
+    /// <summary>
+    /// Displays a dialog requiring confirmation before removing all entries the current user has made for this draw.
+    /// </summary>
+    private async Task RemoveUserEntriesWithConfirmation()
+    {
+        await FetchFreshData();
+        
+        // Display confirmation dialog
+        var result = await DialogService.ShowMessageBox(
+            "Remove Entries",
+            "All of your entries for this draw will be removed! Are you sure?",
+            yesText: "Remove", cancelText: "Cancel");
+        
+        if (_userEntries == null || result == null) return;
+        
+        foreach (var entry in _userEntries)
+        {
+            await EntryService.DeleteEntry(entry.Id);
+        }
+        
+        await SnackbarHelper.QueueSnackbarMessageForReload("RemovedEntries", 
+            "You have removed your entries for this draw!");
+        NavigationManager.NavigateTo(NavigationManager.Uri, true);
+    }
+
+    
+    private async Task EnterDrawAsUser()
+    {
+        await FetchFreshData();
+
+        if (_availableEntries == 0)
+            return;
+        
+        if (_selectedNumberOfEntries > _availableEntries || _selectedLuckyNumbers.Count() > _availableEntries)
+        {
+            Snackbar.Add("Failed to enter draw - too many selections.", Severity.Error);
+            return;
+        }
+        
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        var userId = "";
+
+        if (user.Identity is { IsAuthenticated: true })
+        {
+            userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        }
+
+        if (userId == "") return;
+
+        List<EntryModel> entries = [];
+
+        switch (_draw?.DrawType)
+        {
+            case DrawTypeEnum.Raffle:
+                for (var i = 0; i < _selectedNumberOfEntries; i++)
+                {
+                    entries.Add(new EntryModel
+                    {
+                        DrawId = DrawId,
+                        UserId = userId
+                    });
+                }
+                break;
+            case DrawTypeEnum.Lottery:
+                for (var i = 0; i < _selectedLuckyNumbers.Count(); i++)
+                {
+                    entries.Add(new EntryModel
+                    {
+                        DrawId = DrawId,
+                        UserId = userId,
+                        LuckyNumber = _selectedLuckyNumbers.ToList()[i]
+                    });
+                }
+                break;
+            default:
+                return;
+        }
+
+        foreach (var entry in entries)
+        {
+            await EntryService.AddEntry(entry);
+        }
+        
+        await SnackbarHelper.QueueSnackbarMessageForReload("EnteredDraw", "Draw entered!");
+        NavigationManager.NavigateTo(NavigationManager.Uri, true);
+    }
+
+    private async Task EnterDrawAsGuest()
+    {
+        await FetchFreshData();
     }
 }
