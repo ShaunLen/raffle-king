@@ -33,10 +33,4 @@
       </Content>
     </ItemGroup>
 
-
-    <ItemGroup>
-      <Folder Include="Services\BLL\Implementations\" />
-      <Folder Include="Services\BLL\Interfaces\" />
-    </ItemGroup>
-
 </Project>
