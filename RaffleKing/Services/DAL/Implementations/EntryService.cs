@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using RaffleKing.Data;
 using RaffleKing.Data.Models;
-using RaffleKing.Services.Interfaces;
+using RaffleKing.Services.DAL.Interfaces;
 
-namespace RaffleKing.Services;
+namespace RaffleKing.Services.DAL.Implementations;
 
 public class EntryService(IDbContextFactory<ApplicationDbContext> factory, IHttpContextAccessor httpContextAccessor) : IEntryService
 {

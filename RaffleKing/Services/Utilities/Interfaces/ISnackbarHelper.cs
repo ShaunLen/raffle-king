@@ -1,6 +1,4 @@
-﻿using MudBlazor;
-
-namespace RaffleKing.Services.Interfaces;
+﻿namespace RaffleKing.Services.Utilities.Interfaces;
 
 public interface ISnackbarHelper
 {

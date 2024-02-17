@@ -1,6 +1,6 @@
 ﻿using RaffleKing.Data.Models;
 
-namespace RaffleKing.Services.Interfaces;
+namespace RaffleKing.Services.DAL.Interfaces;
 
 public interface IEntryService
 {

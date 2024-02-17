@@ -1,5 +1,7 @@
 ﻿@page "/draws/draw-details/{drawId:int}"
 @using RaffleKing.Data.Models
+@using RaffleKing.Services.DAL.Interfaces
+@using RaffleKing.Services.Utilities.Interfaces
 @inject IDrawService DrawService
 @inject IPrizeService PrizeService
 @inject IEntryService EntryService

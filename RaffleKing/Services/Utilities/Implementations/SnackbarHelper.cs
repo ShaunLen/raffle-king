@@ -1,8 +1,8 @@
 ﻿using Blazored.LocalStorage;
 using MudBlazor;
-using RaffleKing.Services.Interfaces;
+using RaffleKing.Services.Utilities.Interfaces;
 
-namespace RaffleKing.Services;
+namespace RaffleKing.Services.Utilities.Implementations;
 
 public class SnackbarHelper(ISnackbar snackbar, ILocalStorageService localStorage) : ISnackbarHelper
 {

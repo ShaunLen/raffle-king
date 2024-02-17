@@ -9,7 +9,10 @@ using RaffleKing.Data;
 using MudBlazor.Services;
 using RaffleKing.Infrastructure;
 using RaffleKing.Services;
-using RaffleKing.Services.Interfaces;
+using RaffleKing.Services.DAL.Implementations;
+using RaffleKing.Services.DAL.Interfaces;
+using RaffleKing.Services.Utilities.Implementations;
+using RaffleKing.Services.Utilities.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
