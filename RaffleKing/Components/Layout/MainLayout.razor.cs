@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-using MudBlazor;
+﻿using MudBlazor;
 
 namespace RaffleKing.Components.Layout;
 
@@ -21,26 +20,21 @@ public partial class MainLayout
     
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        if (user.Identity == null)
-            return;
-        
-        _username = user.Identity.Name;
+        _username = await UserService.GetUsername();
     }
 
     /// <summary>
-    /// Closes the MudDrawer containing LeftNav, if not being held open through use of the menu button.
+    /// Closes the navigation drawer if it is not pinned open.
     /// </summary>
     private void CloseDrawer()
     {
         if (_isDrawerHeldOpen) return;
         _isDrawerOpen = false;
-        _leftNav.CloseExpandedGroups();;
+        _leftNav.CloseExpandedGroups();
     }
 
     /// <summary>
-    /// Toggles the expansion of the MudDrawer containing LeftNav.
+    /// Toggles the open state of the navigation drawer, including its pinned state.
     /// </summary>
     private void ToggleDrawer()
     {
@@ -49,7 +43,7 @@ public partial class MainLayout
     }
 
     /// <summary>
-    /// Toggles the visibility of the account popover MudPopover.
+    /// Toggles the visibility of the account popover.
     /// </summary>
     private void ToggleAccountPopover()
     {
@@ -57,7 +51,7 @@ public partial class MainLayout
     }
     
     /// <summary>
-    /// Overrides default theme. Non-overridden properties are set to default theme values.
+    /// Defines the default theme for the application, specifying both light and dark palette options.
     /// </summary>
     public static MudTheme DefaultTheme => new()
     {

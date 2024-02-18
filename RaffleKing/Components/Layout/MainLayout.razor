@@ -1,6 +1,7 @@
-﻿@inherits LayoutComponentBase
+﻿@using RaffleKing.Services.BLL.Interfaces
+@inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
-@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IUserService UserService
 
 <MudThemeProvider @bind-IsDarkMode="@_isDarkModeActive" Theme="DefaultTheme"/>
 <MudDialogProvider/>
