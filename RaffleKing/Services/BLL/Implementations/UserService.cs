@@ -13,6 +13,18 @@ public class UserService(AuthenticationStateProvider authenticationStateProvider
         var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
         return authState.User;
     }
+
+    public async Task<string?> GetUserId()
+    {
+        var user = await GetUser();
+        return user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    }
+
+    public async Task<string?> GetUsername()
+    {
+        var user = await GetUser();
+        return user.Identity is { IsAuthenticated: true } ? user.Identity.Name : "";
+    }
     
     public async Task<bool> IsGuest()
     {
@@ -36,12 +48,6 @@ public class UserService(AuthenticationStateProvider authenticationStateProvider
     {
         var user = await GetUser();
         return user.IsInRole("Admin");
-    }
-
-    public async Task<string?> GetUsername()
-    {
-        var user = await GetUser();
-        return user.Identity is { IsAuthenticated: true } ? user.Identity.Name : "";
     }
 
     public async Task<bool> IsHostOfDraw(int drawId)
