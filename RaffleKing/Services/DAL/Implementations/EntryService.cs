@@ -17,7 +17,7 @@ public class EntryService(IDbContextFactory<ApplicationDbContext> factory, IHttp
     }
 
     /* Read Operations */
-    public async Task<List<EntryModel>?> GetEntriesForDraw(int drawId)
+    public async Task<List<EntryModel>?> GetEntriesByDraw(int drawId)
     {
         await using var context = await factory.CreateDbContextAsync();
         return await context.Entries
@@ -25,7 +25,7 @@ public class EntryService(IDbContextFactory<ApplicationDbContext> factory, IHttp
             .ToListAsync();
     }
 
-    public async Task<List<EntryModel>?> GetEntriesForDrawByUser(int drawId)
+    public async Task<List<EntryModel>?> GetCurrentUserEntriesByDraw(int drawId)
     {
         await using var context = await factory.CreateDbContextAsync();
         var userId = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -37,7 +37,7 @@ public class EntryService(IDbContextFactory<ApplicationDbContext> factory, IHttp
             .ToListAsync();
     }
     
-    public async Task<List<EntryModel>?> GetEntriesForDrawByGuest(int drawId, string guestRef)
+    public async Task<List<EntryModel>?> GetGuestEntriesByDraw(int drawId, string guestRef)
     {
         await using var context = await factory.CreateDbContextAsync();
         return await context.Entries

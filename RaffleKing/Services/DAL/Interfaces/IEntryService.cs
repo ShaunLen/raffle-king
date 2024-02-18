@@ -8,9 +8,9 @@ public interface IEntryService
     public Task AddEntry(EntryModel entryModel);
     
     /* Read Operations */
-    public Task<List<EntryModel>?> GetEntriesForDraw(int drawId);
-    public Task<List<EntryModel>?> GetEntriesForDrawByUser(int drawId);
-    public Task<List<EntryModel>?> GetEntriesForDrawByGuest(int drawId, string guestRef);
+    public Task<List<EntryModel>?> GetEntriesByDraw(int drawId);
+    public Task<List<EntryModel>?> GetCurrentUserEntriesByDraw(int drawId);
+    public Task<List<EntryModel>?> GetGuestEntriesByDraw(int drawId, string guestRef);
     
     /* Update Operations */
     public Task SelectWinnersForDraw(int drawId);
