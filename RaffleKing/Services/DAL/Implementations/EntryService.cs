@@ -98,6 +98,17 @@ public class EntryService(IDbContextFactory<ApplicationDbContext> factory, IHttp
         }
     }
 
+    public async Task DeleteEntriesByDraw(int drawId)
+    {
+        await using var context = await factory.CreateDbContextAsync();
+        var entries = await GetEntriesByDraw(drawId);
+        if (entries != null)
+        {
+            context.Entries.RemoveRange(entries);
+            await context.SaveChangesAsync();
+        }
+    }
+
     public async Task DeleteEntriesByUserAndDraw(string userId, int drawId)
     {
         await using var context = await factory.CreateDbContextAsync();
@@ -105,6 +116,17 @@ public class EntryService(IDbContextFactory<ApplicationDbContext> factory, IHttp
         if (entries != null)
         {
             context.Entries.RemoveRange(entries);
+            await context.SaveChangesAsync();
+        }
+    }
+
+    public async Task DeleteEntryByGuestRef(string guestRef)
+    {
+        await using var context = await factory.CreateDbContextAsync();
+        var entry = await GetEntryByGuestRef(guestRef);
+        if (entry != null)
+        {
+            context.Entries.Remove(entry);
             await context.SaveChangesAsync();
         }
     }

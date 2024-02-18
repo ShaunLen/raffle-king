@@ -22,5 +22,7 @@ public interface IEntryService
     /* Delete Operations */
     public Task DeleteEntry(int entryId);
     public Task DeleteEntriesByUser(string userId);
+    public Task DeleteEntriesByDraw(int drawId);
     public Task DeleteEntriesByUserAndDraw(string userId, int drawId);
+    public Task DeleteEntryByGuestRef(string guestRef);
 }
