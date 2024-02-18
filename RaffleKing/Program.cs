@@ -8,7 +8,8 @@ using RaffleKing.Components.Account;
 using RaffleKing.Data;
 using MudBlazor.Services;
 using RaffleKing.Infrastructure;
-using RaffleKing.Services;
+using RaffleKing.Services.BLL.Implementations;
+using RaffleKing.Services.BLL.Interfaces;
 using RaffleKing.Services.DAL.Implementations;
 using RaffleKing.Services.DAL.Interfaces;
 using RaffleKing.Services.Utilities.Implementations;
@@ -45,12 +46,15 @@ builder.Services.AddAuthentication(options =>
     })
     .AddIdentityCookies();
 
-// Add CRUD services
+// Add BLL services
+builder.Services.AddScoped<IUserService, UserService>();
+
+// Add DAL services
 builder.Services.AddScoped<IDrawService, DrawService>();
 builder.Services.AddScoped<IPrizeService, PrizeService>();
 builder.Services.AddScoped<IEntryService, EntryService>();
 
-// Add helper services
+// Add Utility services
 builder.Services.AddScoped<ISnackbarHelper, SnackbarHelper>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
