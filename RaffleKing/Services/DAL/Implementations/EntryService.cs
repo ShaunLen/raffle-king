@@ -1,12 +1,12 @@
-﻿using System.Security.Claims;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using RaffleKing.Data;
 using RaffleKing.Data.Models;
 using RaffleKing.Services.DAL.Interfaces;
 
 namespace RaffleKing.Services.DAL.Implementations;
 
-public class EntryService(IDbContextFactory<ApplicationDbContext> factory, IHttpContextAccessor httpContextAccessor) : IEntryService
+public class EntryService(IDbContextFactory<ApplicationDbContext> factory, IHttpContextAccessor httpContextAccessor) 
+    : IEntryService
 {
     /* Create Operations */
     public async Task AddEntry(EntryModel entryModel)
@@ -17,6 +17,20 @@ public class EntryService(IDbContextFactory<ApplicationDbContext> factory, IHttp
     }
 
     /* Read Operations */
+    public async Task<List<EntryModel>?> GetAllEntries()
+    {
+        await using var context = await factory.CreateDbContextAsync();
+        return await context.Entries.ToListAsync();
+    }
+
+    public async Task<List<EntryModel>?> GetEntriesByUser(string userId)
+    {
+        await using var context = await factory.CreateDbContextAsync();
+        return await context.Entries
+            .Where(entry => entry.UserId == userId)
+            .ToListAsync();
+    }
+
     public async Task<List<EntryModel>?> GetEntriesByDraw(int drawId)
     {
         await using var context = await factory.CreateDbContextAsync();
@@ -25,35 +39,40 @@ public class EntryService(IDbContextFactory<ApplicationDbContext> factory, IHttp
             .ToListAsync();
     }
 
-    public async Task<List<EntryModel>?> GetCurrentUserEntriesByDraw(int drawId)
+    public async Task<List<EntryModel>?> GetEntriesByUserAndDraw(string userId, int drawId)
     {
         await using var context = await factory.CreateDbContextAsync();
-        var userId = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (userId == null)
-            return null;
-
         return await context.Entries
-            .Where(entry => entry.DrawId == drawId && entry.UserId == userId)
+            .Where(entry => entry.UserId == userId && entry.DrawId == drawId)
             .ToListAsync();
     }
-    
-    public async Task<List<EntryModel>?> GetGuestEntriesByDraw(int drawId, string guestRef)
+
+    public async Task<EntryModel?> GetEntryByGuestRef(string guestRef)
     {
         await using var context = await factory.CreateDbContextAsync();
-        return await context.Entries
-            .Where(entry => entry.DrawId == drawId && entry.GuestReferenceCode == guestRef)
-            .ToListAsync();
+        return await context.Entries.FirstOrDefaultAsync(entry => entry.GuestReferenceCode == guestRef);
     }
 
     /* Update Operations */
-    public async Task SelectWinnersForDraw(int drawId)
+    public async Task UpdateEntry(EntryModel entryModel)
     {
-        throw new NotImplementedException();
+        await using var context = await factory.CreateDbContextAsync();
+        context.Entries.Update(entryModel);
+        await context.SaveChangesAsync();
     }
 
-    public async Task RemoveGuestInformation(int entryId)
+    public async Task<int> CountEntriesByDraw(int drawId)
     {
-        throw new NotImplementedException();
+        await using var context = await factory.CreateDbContextAsync();
+        return await context.Entries
+            .CountAsync(entry => entry.DrawId == drawId);
+    }
+
+    public async Task<int> CountEntriesByUserAndDraw(string userId, int drawId)
+    {
+        await using var context = await factory.CreateDbContextAsync();
+        return await context.Entries
+            .CountAsync(entry => entry.UserId == userId && entry.DrawId == drawId);
     }
 
     /* Delete Operations */
@@ -64,6 +83,28 @@ public class EntryService(IDbContextFactory<ApplicationDbContext> factory, IHttp
         if (entry != null)
         {
             context.Entries.Remove(entry);
+            await context.SaveChangesAsync();
+        }
+    }
+
+    public async Task DeleteEntriesByUser(string userId)
+    {
+        await using var context = await factory.CreateDbContextAsync();
+        var entries = await GetEntriesByUser(userId);
+        if (entries != null)
+        {
+            context.Entries.RemoveRange(entries);
+            await context.SaveChangesAsync();
+        }
+    }
+
+    public async Task DeleteEntriesByUserAndDraw(string userId, int drawId)
+    {
+        await using var context = await factory.CreateDbContextAsync();
+        var entries = await GetEntriesByUserAndDraw(userId, drawId);
+        if (entries != null)
+        {
+            context.Entries.RemoveRange(entries);
             await context.SaveChangesAsync();
         }
     }
