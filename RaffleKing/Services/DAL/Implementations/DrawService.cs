@@ -24,6 +24,14 @@ public class DrawService(IDbContextFactory<ApplicationDbContext> factory, IHttpC
         return await context.Draws.FirstOrDefaultAsync(draw => draw.Id == drawId);
     }
 
+    public async Task<List<DrawModel>?> GetDrawsByIds(List<int> drawIds)
+    {
+        await using var context = await factory.CreateDbContextAsync();
+        return await context.Draws
+            .Where(draw => drawIds.Contains(draw.Id))
+            .ToListAsync();
+    }
+
     public async Task<List<DrawModel>?> GetAllDraws()
     {
         await using var context = await factory.CreateDbContextAsync();
