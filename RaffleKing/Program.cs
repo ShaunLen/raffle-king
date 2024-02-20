@@ -48,6 +48,7 @@ builder.Services.AddAuthentication(options =>
 
 // Add BLL services
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IEntryManagementService, EntryManagementService>();
 
 // Add DAL services
 builder.Services.AddScoped<IDrawService, DrawService>();
