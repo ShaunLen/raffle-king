@@ -8,19 +8,120 @@ namespace RaffleKing.Services.BLL.Implementations;
 public class EntryManagementService(IUserService userService, IEntryService entryService, IDrawService drawService)
     : IEntryManagementService
 {
-    public async Task<OperationResult> TryEnterRaffle(int drawId, int numberOfEntries)
+    public async Task<OperationResult> TryEnterRaffle(int drawId, int numberOfEntries, string guestEmail = "")
     {
-        throw new NotImplementedException();
+        var canEnter = await CurrentUserCanEnterDraw(drawId);
+        var isGuest = await userService.IsAuthenticated();
+
+        if (!canEnter.Success)
+            return canEnter;
+
+        if (numberOfEntries > await CountCurrentUserEntriesRemainingByDraw(drawId))
+            return OperationResult.Fail("Selected number of entries exceeds available entries!");
+        
+        if(isGuest && numberOfEntries > 1)
+            return OperationResult.Fail("Guests can only enter each raffle once! Create an account for more entries.");
+        
+        if(isGuest && string.IsNullOrWhiteSpace(guestEmail))
+            return OperationResult.Fail("An email must be supplied to enter as a guest.");
+
+        if (isGuest && await IsGuestParticipatingInDraw(drawId, guestEmail))
+            return OperationResult.Fail("You are already participating in this draw as a guest! Create an account " +
+                                        "for more entries.");
+        
+        List<EntryModel> entries = [];
+
+        if (isGuest)
+        {
+            for (var i = 0; i < numberOfEntries; i++)
+            {
+                entries.Add(new EntryModel
+                {
+                    DrawId = drawId,
+                    UserId = await userService.GetUserId()
+                });
+            }
+        }
+        else
+        {
+            entries.Add(new EntryModel
+            {
+                DrawId = drawId,
+                IsGuest = true,
+                GuestEmail = guestEmail,
+                GuestReferenceCode = Guid.NewGuid().ToString("N")
+            });
+        }
+
+        foreach (var entry in entries)
+            await entryService.AddEntry(entry);
+        
+        return OperationResult.Ok();
     }
 
     public async Task<OperationResult> TryEnterLottery(int drawId, IEnumerable<int> luckyNumbers)
     {
-        throw new NotImplementedException();
+        var canEnter = await CurrentUserCanEnterDraw(drawId);
+
+        if (!canEnter.Success)
+            return canEnter;
+
+        luckyNumbers = luckyNumbers.ToList();
+        if (luckyNumbers.Count() > await CountCurrentUserEntriesRemainingByDraw(drawId))
+            return OperationResult.Fail("Selected number of entries exceeds available entries!");
+
+        var availableLuckyNumbers = await GetAvailableLuckyNumbersByDraw(drawId);
+        var unavailableNumbers = 
+            luckyNumbers.Where(luckyNumber => !availableLuckyNumbers.Contains(luckyNumber)).ToList();
+        
+        if (unavailableNumbers.Count != 0)
+            return OperationResult.Fail($"Lucky Number(s) {string.Join(", ", unavailableNumbers)} is/are " +
+                                        $"not available!");
+        
+        List<EntryModel> entries = [];
+
+        foreach (var luckyNumber in luckyNumbers)
+        {
+            entries.Add(new EntryModel
+            {
+                DrawId = drawId,
+                UserId = await userService.GetUserId(),
+                LuckyNumber = luckyNumber
+            });
+        }
+        
+        foreach (var entry in entries)
+            await entryService.AddEntry(entry);
+        
+        return OperationResult.Ok();
     }
 
-    public async Task<OperationResult> CanEnterDraw(int drawId, IEnumerable<int> luckyNumbers)
+    public async Task<OperationResult> CurrentUserCanEnterDraw(int drawId)
     {
-        throw new NotImplementedException();
+        var draw = await drawService.GetDrawById(drawId);
+
+        if (await userService.IsHostOfDraw(drawId))
+            return OperationResult.Fail("You cannot enter your own draw!");
+        
+        if(await CountEntriesRemainingByDraw(drawId) < 1)
+            return OperationResult.Fail("This draw has no entries remaining!");
+
+        if (await CountCurrentUserEntriesRemainingByDraw(drawId) < 1)
+            return OperationResult.Fail("You have no remaining entries for this draw!");
+
+        switch (draw?.DrawType)
+        {
+            case DrawTypeEnum.Raffle:
+                break;
+            case DrawTypeEnum.Lottery:
+                if(!await userService.IsAuthenticated())
+                    return OperationResult.Fail("Only registered users can enter lotteries!");
+                break;
+            default:
+                return OperationResult.Fail("Invalid draw type.");
+        }
+        
+        return OperationResult.Ok();
     }
 
     public async Task<List<EntryModel>?> GetEntriesByDraw(int drawId)
@@ -134,5 +235,11 @@ public class EntryManagementService(IUserService userService, IEntryService entr
     public async Task<bool> IsCurrentUserParticipatingInDraw(int drawId)
     {
         return await CountCurrentUserEntriesByDraw(drawId) > 0;
+    }
+
+    public async Task<bool> IsGuestParticipatingInDraw(int drawId, string guestEmail)
+    {
+        var entries = await GetEntriesByDraw(drawId);
+        return entries != null && entries.Any(entry => entry.GuestEmail == guestEmail);
     }
 }

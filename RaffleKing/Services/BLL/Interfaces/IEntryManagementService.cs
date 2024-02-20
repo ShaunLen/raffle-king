@@ -5,9 +5,9 @@ namespace RaffleKing.Services.BLL.Interfaces;
 
 public interface IEntryManagementService
 {
-    Task<OperationResult> TryEnterRaffle(int drawId, int numberOfEntries);
+    Task<OperationResult> TryEnterRaffle(int drawId, int numberOfEntries, string guestEmail = "");
     Task<OperationResult> TryEnterLottery(int drawId, IEnumerable<int> luckyNumbers);
-    Task<OperationResult> CanEnterDraw(int drawId, IEnumerable<int> luckyNumbers);
+    Task<OperationResult> CurrentUserCanEnterDraw(int drawId);
     Task<List<EntryModel>?> GetEntriesByDraw(int drawId);
     Task<List<EntryModel>?> GetCurrentUserEntries();
     Task<List<EntryModel>?> GetCurrentUserEntriesByDraw(int drawId);
@@ -22,4 +22,5 @@ public interface IEntryManagementService
     Task<List<int>> GetAvailableLuckyNumbersByDraw(int drawId);
     Task<List<DrawModel>?> GetDrawsEnteredByCurrentUser();
     Task<bool> IsCurrentUserParticipatingInDraw(int drawId);
+    Task<bool> IsGuestParticipatingInDraw(int drawId, string guestEmail);
 }
