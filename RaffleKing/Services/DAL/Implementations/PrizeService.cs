@@ -22,7 +22,7 @@ public class PrizeService(IDbContextFactory<ApplicationDbContext> factory, IHttp
         return await context.Prizes.FirstOrDefaultAsync(prize => prize.Id == prizeId);
     }
     
-    public async Task<List<PrizeModel>?> GetPrizesForDraw(int drawId)
+    public async Task<List<PrizeModel>?> GetPrizesByDraw(int drawId)
     {
         await using var context = await factory.CreateDbContextAsync();
         return await context.Prizes.Where(prize => prize.DrawId == drawId).ToListAsync();

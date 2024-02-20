@@ -9,7 +9,7 @@ public interface IPrizeService
     
     /* Read Operations */
     public Task<PrizeModel?> GetPrizeById(int prizeId);
-    public Task<List<PrizeModel>?> GetPrizesForDraw(int drawId);
+    public Task<List<PrizeModel>?> GetPrizesByDraw(int drawId);
     
     /* Delete Operations */
     public Task DeletePrize(int prizeId);
