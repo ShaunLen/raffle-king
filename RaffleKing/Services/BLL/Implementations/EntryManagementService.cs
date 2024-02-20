@@ -11,7 +11,7 @@ public class EntryManagementService(IUserService userService, IEntryService entr
     public async Task<OperationResult> TryEnterRaffle(int drawId, int numberOfEntries, string guestEmail = "")
     {
         var canEnter = await CurrentUserCanEnterDraw(drawId);
-        var isGuest = await userService.IsAuthenticated();
+        var isGuest = await userService.IsGuest();
 
         if (!canEnter.Success)
             return canEnter;
@@ -33,6 +33,16 @@ public class EntryManagementService(IUserService userService, IEntryService entr
 
         if (isGuest)
         {
+            entries.Add(new EntryModel
+            {
+                DrawId = drawId,
+                IsGuest = true,
+                GuestEmail = guestEmail,
+                GuestReferenceCode = Guid.NewGuid().ToString("N")
+            });
+        }
+        else
+        {
             for (var i = 0; i < numberOfEntries; i++)
             {
                 entries.Add(new EntryModel
@@ -41,16 +51,6 @@ public class EntryManagementService(IUserService userService, IEntryService entr
                     UserId = await userService.GetUserId()
                 });
             }
-        }
-        else
-        {
-            entries.Add(new EntryModel
-            {
-                DrawId = drawId,
-                IsGuest = true,
-                GuestEmail = guestEmail,
-                GuestReferenceCode = Guid.NewGuid().ToString("N")
-            });
         }
 
         foreach (var entry in entries)
@@ -114,7 +114,7 @@ public class EntryManagementService(IUserService userService, IEntryService entr
             case DrawTypeEnum.Raffle:
                 break;
             case DrawTypeEnum.Lottery:
-                if(!await userService.IsAuthenticated())
+                if(await userService.IsGuest())
                     return OperationResult.Fail("Only registered users can enter lotteries!");
                 break;
             default:
