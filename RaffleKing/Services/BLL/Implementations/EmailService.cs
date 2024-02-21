@@ -1,7 +1,7 @@
-﻿using MailKit.Net.Smtp;
-using MimeKit;
+﻿using MimeKit;
 using MimeKit.Text;
 using RaffleKing.Services.BLL.Interfaces;
+using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
 namespace RaffleKing.Services.BLL.Implementations;
 
@@ -11,7 +11,7 @@ public class EmailService(string smtpServer, int smtpPort, string fromAddress, s
     public async Task SendEmail(string to, string subject, string body)
     {
         var email = new MimeMessage();
-        email.From.Add(MailboxAddress.Parse(fromAddress));
+        email.From.Add(new MailboxAddress("Raffle King", fromAddress));
         email.To.Add(MailboxAddress.Parse(to));
         email.Subject = subject;
         email.Body = new TextPart(TextFormat.Plain) { Text = body };
