@@ -48,6 +48,8 @@ builder.Services.AddAuthentication(options =>
 
 // Add BLL services
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IDrawManagementService, DrawManagementService>();
+builder.Services.AddScoped<IPrizeManagementService, PrizeManagementService>();
 builder.Services.AddScoped<IEntryManagementService, EntryManagementService>();
 
 // Add DAL services
@@ -55,8 +57,18 @@ builder.Services.AddScoped<IDrawService, DrawService>();
 builder.Services.AddScoped<IPrizeService, PrizeService>();
 builder.Services.AddScoped<IEntryService, EntryService>();
 
-// Add Utility services
+// Add utility services
 builder.Services.AddScoped<ISnackbarHelper, SnackbarHelper>();
+
+// Add email service
+var emailConfig = builder.Configuration.GetSection("EmailSettings");
+builder.Services.AddSingleton<IEmailService>(new EmailService(
+    emailConfig["SmtpServer"] ?? string.Empty,
+    int.Parse(emailConfig["SmtpPort"] ?? string.Empty),
+    emailConfig["FromAddress"] ?? string.Empty,
+    emailConfig["SmtpUsername"] ?? string.Empty,
+    emailConfig["SmtpPassword"] ?? string.Empty
+));
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
                        throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
