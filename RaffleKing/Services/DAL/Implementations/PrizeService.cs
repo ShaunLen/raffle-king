@@ -28,6 +28,15 @@ public class PrizeService(IDbContextFactory<ApplicationDbContext> factory, IHttp
         return await context.Prizes.Where(prize => prize.DrawId == drawId).ToListAsync();
     }
 
+    public async Task<int> CountPrizesByDraw(int drawId, bool includeQty = true)
+    {
+        var prizes = await GetPrizesByDraw(drawId);
+        if (prizes == null)
+            return 0;
+
+        return !includeQty ? prizes.Count : prizes.Sum(prize => prize.Quantity);
+    }
+
     /* Delete Operations */
     public async Task DeletePrize(int prizeId)
     {
@@ -36,6 +45,17 @@ public class PrizeService(IDbContextFactory<ApplicationDbContext> factory, IHttp
         if (prize != null)
         {
             context.Prizes.Remove(prize);
+            await context.SaveChangesAsync();
+        }
+    }
+
+    public async Task DeletePrizesByDraw(int drawId)
+    {
+        await using var context = await factory.CreateDbContextAsync();
+        var prizes = await GetPrizesByDraw(drawId);
+        if (prizes != null)
+        {
+            context.Prizes.RemoveRange(prizes);
             await context.SaveChangesAsync();
         }
     }
