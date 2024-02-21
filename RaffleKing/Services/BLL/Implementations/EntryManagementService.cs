@@ -1,4 +1,6 @@
-﻿using RaffleKing.Common;
+﻿using System.Globalization;
+using System.Text.RegularExpressions;
+using RaffleKing.Common;
 using RaffleKing.Data.Models;
 using RaffleKing.Services.BLL.Interfaces;
 using RaffleKing.Services.DAL.Interfaces;
@@ -16,18 +18,23 @@ public class EntryManagementService(IUserService userService, IEntryService entr
         if (!canEnter.Success)
             return canEnter;
 
+        if (isGuest)
+        {
+            if(numberOfEntries > 1)
+                return OperationResult.Fail("Guests can only enter each raffle once! Create an account for " +
+                                            "more entries.");
+            
+            if (await IsGuestParticipatingInDraw(drawId, guestEmail))
+                return OperationResult.Fail("You are already participating in this draw as a guest! Create an " +
+                                            "account for more entries.");
+            
+            var validEmail = IsValidEmailAddress(guestEmail);
+            if (!validEmail.Success)
+                return validEmail;
+        }
+
         if (numberOfEntries > await CountCurrentUserEntriesRemainingByDraw(drawId))
             return OperationResult.Fail("Selected number of entries exceeds available entries!");
-        
-        if(isGuest && numberOfEntries > 1)
-            return OperationResult.Fail("Guests can only enter each raffle once! Create an account for more entries.");
-        
-        if(isGuest && string.IsNullOrWhiteSpace(guestEmail))
-            return OperationResult.Fail("An email must be supplied to enter as a guest.");
-
-        if (isGuest && await IsGuestParticipatingInDraw(drawId, guestEmail))
-            return OperationResult.Fail("You are already participating in this draw as a guest! Create an account " +
-                                        "for more entries.");
         
         List<EntryModel> entries = [];
 
@@ -57,6 +64,61 @@ public class EntryManagementService(IUserService userService, IEntryService entr
             await entryService.AddEntry(entry);
         
         return OperationResult.Ok();
+    }
+
+    /// <summary>
+    /// Use RegEx to perform some basic validation on the format of an email address. Adapted from Microsoft Learn -
+    /// https://learn.microsoft.com/en-us/dotnet/standard/base-types/how-to-verify-that-strings-are-in-valid-email-format
+    /// </summary>
+    /// <param name="email">The email address to validate</param>
+    /// <returns></returns>
+    private OperationResult IsValidEmailAddress(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return OperationResult.Fail("An email address must be supplied to enter as a guest.");
+
+        try
+        {
+            // Normalize the domain
+            email = Regex.Replace(email, @"(@)(.+)$", DomainMapper,
+                RegexOptions.None, TimeSpan.FromMilliseconds(200));
+
+            // Examines the domain part of the email and normalizes it.
+            string DomainMapper(Match match)
+            {
+                // Use IdnMapping class to convert Unicode domain names.
+                var idn = new IdnMapping();
+
+                // Pull out and process domain name (throws ArgumentException on invalid)
+                var domainName = idn.GetAscii(match.Groups[2].Value);
+
+                return match.Groups[1].Value + domainName;
+            }
+        }
+        catch (RegexMatchTimeoutException e)
+        {
+            return OperationResult.Fail("Operation timed out.");
+        }
+        catch (ArgumentException e)
+        {
+            return OperationResult.Fail("Unhandled exception.");
+        }
+
+        try
+        {
+            var isValid = Regex.IsMatch(email,
+                @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
+                RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
+            
+            if(isValid)
+                return OperationResult.Ok();
+            else
+                return OperationResult.Fail("Email address is not valid.");
+        }
+        catch (RegexMatchTimeoutException)
+        {
+            return OperationResult.Fail("Operation timed out.");
+        }
     }
 
     public async Task<OperationResult> TryEnterLottery(int drawId, IEnumerable<int> luckyNumbers)
@@ -187,6 +249,9 @@ public class EntryManagementService(IUserService userService, IEntryService entr
 
     public async Task<int> CountCurrentUserEntriesRemainingByDraw(int drawId)
     {
+        if (await userService.IsGuest())
+            return 1;
+        
         var draw = await drawService.GetDrawById(drawId);
         return draw == null ? 0 
             : Math.Min(draw.MaxEntriesPerUser - await CountCurrentUserEntriesByDraw(drawId), 
