@@ -1,15 +1,15 @@
 ﻿@page "/draws/draw-details/{drawId:int}"
 @using RaffleKing.Data.Models
-@using RaffleKing.Services.DAL.Interfaces
+@using RaffleKing.Services.BLL.Interfaces
 @using RaffleKing.Services.Utilities.Interfaces
-@inject IDrawService DrawService
-@inject IPrizeService PrizeService
-@inject IEntryService EntryService
+@inject IDrawManagementService DrawManagementService
+@inject IPrizeManagementService PrizeManagementService
+@inject IEntryManagementService EntryManagementService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 @inject NavigationManager NavigationManager
-@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ISnackbarHelper SnackbarHelper
+@inject IUserService UserService
 
 <PageTitle>Draw Details</PageTitle>
 
@@ -86,9 +86,18 @@
                     </MudPaper>
                 </MudContainer>
                 <MudContainer MaxWidth="MaxWidth.ExtraSmall">
-                    <MudText Typo="Typo.h6" Color="Color.Primary" Align="Align.Center">
-                        @(_userIsHost ? "DRAW ACTIONS" : "ENTER DRAW")
-                    </MudText>
+                    @if (_userIsGuest)
+                    {
+                        <MudText Typo="Typo.h6" Color="Color.Primary" Align="Align.Center">
+                            @(_userIsHost ? "DRAW ACTIONS" : "ENTER DRAW")
+                        </MudText>
+                    }
+                    else
+                    {
+                        <MudText Typo="Typo.h6" Color="Color.Primary" Align="Align.Center">
+                            @(_userIsHost ? "DRAW ACTIONS" : "ENTER DRAW")
+                        </MudText>
+                    }
                     <MudPaper Class="pa-4 border-t-2 mud-border-primary">
                         @if (_userIsHost)
                         {
@@ -99,6 +108,7 @@
                                     Add Prize
                                 </MudButton>
                             }
+
                             @if (_prizes is { Count: > 0 } && _draw is { IsActive: false })
                             {
                                 <MudButton Variant="Variant.Filled" Color="Color.Info" FullWidth="true" Class="mb-4"
@@ -106,6 +116,7 @@
                                     Publish Draw
                                 </MudButton>
                             }
+
                             <MudButton Variant="Variant.Filled" Color="Color.Error" FullWidth="true"
                                        OnClick="@DeleteDrawWithConfirmation">
                                 Delete Draw
@@ -113,23 +124,37 @@
                         }
                         else
                         {
-                            <MudText Typo="Typo.button" Color="Color.Info">@_percentageEntriesRemaining% Total Entries Remaining</MudText>
+                            <MudText Typo="Typo.button" Color="Color.Info">
+                                @_percentageEntriesRemaining% Total Entries Remaining
+                            </MudText>
                             <MudProgressLinear Striped="true" Color="Color.Info" Size="Size.Large" Class="mt-0"
                                                Value="@_percentageEntriesRemaining"/>
-                            <MudText Typo="Typo.body1" Color="Color.Primary" Class="mt-2">
-                                You have entered this draw @_userEntries?.Count times.
-                            </MudText>
+                            @if (!_userIsGuest)
+                            {
+                                <MudText Typo="Typo.body1" Color="Color.Primary" Class="mt-2">
+                                    You have entered this draw @_userEntriesCount times.
+                                </MudText>
+                            }
+
                             @if (_availableEntries != 0)
                             {
+                                @if (_userIsGuest)
+                                {
+                                    <MudTextField T="string" Label="Email Address" Variant="Variant.Filled"
+                                                  Class="mt-4" Immediate="true" @bind-Value="_guestEmail">
+
+                                    </MudTextField>
+                                }
+
                                 @if (_draw?.DrawType == DrawTypeEnum.Raffle)
                                 {
                                     <MudSelect T="int" Label="Entries" Variant="Variant.Filled" Class="mt-4"
                                                AnchorOrigin="Origin.BottomCenter" Immediate="true"
                                                @bind-Value="_selectedNumberOfEntries">
-                                            @for (var i = 1; i <= _availableEntries; i++)
-                                            {
-                                                <MudSelectItem Value="i"/>
-                                            }
+                                        @for (var i = 1; i <= _availableEntries; i++)
+                                        {
+                                            <MudSelectItem Value="i"/>
+                                        }
                                     </MudSelect>
                                 }
                                 else
@@ -145,12 +170,14 @@
                                         }
                                     </MudSelect>
                                 }
+
                                 <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Class="mt-4"
-                                           OnClick="@EnterDrawAsUser">
+                                           OnClick="@EnterDraw">
                                     Enter Draw
                                 </MudButton>
                             }
-                            if (_userEntries is { Count: > 0 })
+
+                            if (_userEntriesCount > 0)
                             {
                                 <MudButton Variant="Variant.Filled" Color="Color.Error" FullWidth="true" Class="mt-4"
                                            OnClick="@RemoveUserEntriesWithConfirmation">
@@ -180,7 +207,7 @@
                             @if (_draw is { IsActive: false })
                             {
                                 <MudButton Color="Color.Error" Class="pa-0 ml-2"
-                                           OnClick="@(async (e) =>
+                                           OnClick="@(async (_) =>
                                                         await DeletePrizeWithConfirmation(prize.Id))">
                                     Delete Prize
                                 </MudButton>

@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using RaffleKing.Common;
 using RaffleKing.Components.Shared;
 using RaffleKing.Data.Models;
 
@@ -16,29 +17,23 @@ public partial class DrawDetails
 
     private DrawModel? _draw;
     private List<PrizeModel>? _prizes;
-    private List<EntryModel>? _allEntries;
-    private List<EntryModel>? _userEntries;
+    private int _userEntriesCount;
     private int _availableEntries;
     private List<int>? _availableLuckyNumbers;
     private string? _detailsText;
     private bool _userIsHost;
+    private bool _userIsGuest;
     private double _percentageEntriesRemaining;
     private int _selectedNumberOfEntries = 1;
     private IEnumerable<int> _selectedLuckyNumbers = new List<int>();
+    private string _guestEmail = "";
 
     protected override async Task OnInitializedAsync()
     {
+        _draw = await DrawManagementService.GetDrawById(DrawId);
+        _userIsHost = await UserService.IsHostOfDraw(DrawId);
+        _userIsGuest = await UserService.IsGuest();
         await FetchFreshData();
-        
-        // Check whether the currently logged in user is the host of this draw
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
-        if (user.Identity is { IsAuthenticated: true })
-        {
-            _userIsHost = _draw?.DrawHostId == user.FindFirst(
-                System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -53,48 +48,12 @@ public partial class DrawDetails
     /// </summary>
     private async Task FetchFreshData()
     {
-        _draw = await DrawService.GetDrawById(DrawId);
-        _prizes = await PrizeService.GetPrizesForDraw(DrawId);
-        _allEntries = await EntryService.GetEntriesForDraw(DrawId);
-        _userEntries = await EntryService.GetEntriesForDrawByUser(DrawId);
-        _availableEntries = GetAvailableEntries();
-        _availableLuckyNumbers = GetAvailableLuckyNumbers();
+        _prizes = await PrizeManagementService.GetPrizesByDraw(DrawId);
+        _userEntriesCount = await EntryManagementService.CountCurrentUserEntriesByDraw(DrawId);
+        _percentageEntriesRemaining = await EntryManagementService.GetPercentageEntriesRemainingByDraw(DrawId);
+        _availableEntries = await EntryManagementService.CountCurrentUserEntriesRemainingByDraw(DrawId);
+        _availableLuckyNumbers = await EntryManagementService.GetAvailableLuckyNumbersByDraw(DrawId);
         _detailsText = GetDetailsText();
-        
-        if(_allEntries != null && _draw != null)
-            _percentageEntriesRemaining = Math.Round(100 - (float)_allEntries.Count / _draw.MaxEntriesTotal * 100);
-    }
-
-    /// <summary>
-    /// Returns the number of available entries for this draw. Returns the difference between MaxEntriesPerUser and
-    /// the current number of entries made by this user, or the number of total entries remaining, whichever is lower. 
-    /// </summary>
-    /// <returns>Maximum available entries.</returns>
-    private int GetAvailableEntries()
-    {
-        if (_draw is null) return 0;
-
-        if (_userEntries != null && _allEntries != null)
-                return Math.Min(_draw.MaxEntriesPerUser - _userEntries.Count, _draw.MaxEntriesTotal - _allEntries.Count);
-        
-        return 0;
-    }
-
-    /// <summary>
-    /// Returns a list of the available lucky numbers for this draw (if lottery). The list will only contain
-    /// </summary>
-    private List<int> GetAvailableLuckyNumbers()
-    {
-        var availableLuckyNumbers = new List<int>();
-        if (_draw?.DrawType != DrawTypeEnum.Lottery) return availableLuckyNumbers;
-        
-        for (var i = 1; i < 100; i++)
-        {
-            // Temporarily just add max range of lucky numbers until entry logic is added
-            availableLuckyNumbers.Add(i);
-        }
-
-        return availableLuckyNumbers;
     }
 
     /// <summary>
@@ -139,14 +98,21 @@ public partial class DrawDetails
     private async Task PublishDrawWithConfirmation()
     {
         // Display confirmation dialog
-        var result = await DialogService.ShowMessageBox(
+        var confirmed = await DialogService.ShowMessageBox(
             "Publish Draw",
             "Once published, the draw will no longer be editable and will be open to entries. Are you sure?",
             yesText: "Publish", cancelText: "Cancel");
         
-        if (result == null) return;
+        if (confirmed == null) return;
 
-        await DrawService.ActivateDraw(DrawId);
+        var result = await DrawManagementService.ActivateDraw(DrawId);
+
+        if (!result.Success)
+        {
+            Snackbar.Add(result.Message, Severity.Error);
+            return;
+        }
+            
         await SnackbarHelper.QueueSnackbarMessageForReload("DrawPublished", "Draw has been published!");
         NavigationManager.NavigateTo(NavigationManager.Uri, true);
     }
@@ -160,25 +126,15 @@ public partial class DrawDetails
         await FetchFreshData();
         
         // Display confirmation dialog
-        var result = await DialogService.ShowMessageBox(
+        var confirmed = await DialogService.ShowMessageBox(
             "Delete Draw",
             "Deletion is permanent! All associated prizes and entries will also be deleted and no winners " +
             "will be drawn. Are you sure?",
             yesText: "Delete", cancelText: "Cancel");
 
-        if (result == null) return;
+        if (confirmed == null) return;
 
-        // Delete all prizes associated with this draw
-        if (_prizes != null)
-            foreach (var prize in _prizes)
-                await PrizeService.DeletePrize(prize.Id);
-        
-        // Delete all entries associated with this draw
-        if(_allEntries != null)
-            foreach (var entry in _allEntries)
-                await EntryService.DeleteEntry(entry.Id);
-
-        await DrawService.DeleteDraw(DrawId);
+        await DrawManagementService.DeleteDraw(DrawId);
         NavigationManager.NavigateTo("/draws/my-draws");
         Snackbar.Add("Draw deleted successfully", Severity.Success);
     }
@@ -189,14 +145,15 @@ public partial class DrawDetails
     private async Task DeletePrizeWithConfirmation(int prizeId)
     {
         // Display confirmation dialog
-        var result = await DialogService.ShowMessageBox(
+        var confirmed = await DialogService.ShowMessageBox(
             "Delete Prize",
             "Deletion is permanent! Are you sure?",
             yesText: "Delete", cancelText: "Cancel");
 
-        if (result == null) return;
+        if (confirmed == null) 
+            return;
 
-        await PrizeService.DeletePrize(prizeId);
+        await PrizeManagementService.DeletePrize(prizeId);
         await SnackbarHelper.QueueSnackbarMessageForReload("PrizeDeleted", "Prize has been deleted!");
         NavigationManager.NavigateTo(NavigationManager.Uri, true);
     }
@@ -216,7 +173,7 @@ public partial class DrawDetails
 
         if (!result.Canceled)
         {
-            if (result.Data is PrizeModel prize) await PrizeService.AddNewPrize(prize);
+            if (result.Data is PrizeModel prize) await PrizeManagementService.AddNewPrize(prize);
             await SnackbarHelper.QueueSnackbarMessageForReload("PrizeAdded", "Prize has been added!");
             NavigationManager.NavigateTo(NavigationManager.Uri, true);
         }
@@ -230,88 +187,48 @@ public partial class DrawDetails
         await FetchFreshData();
         
         // Display confirmation dialog
-        var result = await DialogService.ShowMessageBox(
+        var confirmed = await DialogService.ShowMessageBox(
             "Remove Entries",
             "All of your entries for this draw will be removed! Are you sure?",
             yesText: "Remove", cancelText: "Cancel");
         
-        if (_userEntries == null || result == null) return;
-        
-        foreach (var entry in _userEntries)
-        {
-            await EntryService.DeleteEntry(entry.Id);
-        }
-        
+        if (confirmed == null) 
+            return;
+
+        await EntryManagementService.RemoveCurrentUserEntriesByDraw(DrawId);
         await SnackbarHelper.QueueSnackbarMessageForReload("RemovedEntries", 
             "You have removed your entries for this draw!");
         NavigationManager.NavigateTo(NavigationManager.Uri, true);
     }
 
     
-    private async Task EnterDrawAsUser()
+    private async Task EnterDraw()
     {
         await FetchFreshData();
 
-        if (_availableEntries == 0)
-            return;
-        
-        if (_selectedNumberOfEntries > _availableEntries || _selectedLuckyNumbers.Count() > _availableEntries)
-        {
-            Snackbar.Add("Failed to enter draw - too many selections.", Severity.Error);
-            return;
-        }
-        
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        var userId = "";
-
-        if (user.Identity is { IsAuthenticated: true })
-        {
-            userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        }
-
-        if (userId == "") return;
-
-        List<EntryModel> entries = [];
-
+        OperationResult result;
         switch (_draw?.DrawType)
         {
             case DrawTypeEnum.Raffle:
-                for (var i = 0; i < _selectedNumberOfEntries; i++)
-                {
-                    entries.Add(new EntryModel
-                    {
-                        DrawId = DrawId,
-                        UserId = userId
-                    });
-                }
+                result = await EntryManagementService.TryEnterRaffle(DrawId, _selectedNumberOfEntries, _guestEmail);
                 break;
             case DrawTypeEnum.Lottery:
-                for (var i = 0; i < _selectedLuckyNumbers.Count(); i++)
-                {
-                    entries.Add(new EntryModel
-                    {
-                        DrawId = DrawId,
-                        UserId = userId,
-                        LuckyNumber = _selectedLuckyNumbers.ToList()[i]
-                    });
-                }
+                result = await EntryManagementService.TryEnterLottery(DrawId, _selectedLuckyNumbers);
                 break;
             default:
                 return;
         }
 
-        foreach (var entry in entries)
+        if (!result.Success)
         {
-            await EntryService.AddEntry(entry);
+            Snackbar.Add(result.Message, Severity.Error);
+            return;
         }
         
-        await SnackbarHelper.QueueSnackbarMessageForReload("EnteredDraw", "Draw entered!");
+        if(_userIsGuest)
+            await SnackbarHelper.QueueSnackbarMessageForReload("EnteredDraw", "Draw entered as guest!");
+        else
+            await SnackbarHelper.QueueSnackbarMessageForReload("EnteredDraw", "Draw entered!");
         NavigationManager.NavigateTo(NavigationManager.Uri, true);
-    }
-
-    private async Task EnterDrawAsGuest()
-    {
-        await FetchFreshData();
     }
 }
