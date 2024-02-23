@@ -161,8 +161,9 @@
                                     }
                                     else
                                     {
-                                        <MudSelect T="int" Label="Lucky Numbers" Variant="Variant.Filled" Value="1" Class="mt-4"
-                                                   AnchorOrigin="Origin.BottomCenter" Immediate="true" MultiSelection="true">
+                                        <MudSelect T="int" Label="Lucky Numbers" Variant="Variant.Filled" Value="1"
+                                                   Class="mt-4" AnchorOrigin="Origin.BottomCenter" Immediate="true"
+                                                   MultiSelection="true" @bind-SelectedValues="_selectedLuckyNumbers">
                                             @if (_availableLuckyNumbers != null)
                                             {
                                                 foreach (var luckyNumber in _availableLuckyNumbers)
