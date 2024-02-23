@@ -136,53 +136,58 @@
                                 </MudText>
                             }
 
-                            @if (_availableEntries != 0)
+                            @if (!_userIsGuest || _draw?.DrawType == DrawTypeEnum.Raffle)
                             {
-                                @if (_userIsGuest)
+                                @if (_availableEntries != 0)
                                 {
-                                    <MudTextField T="string" Label="Email Address" Variant="Variant.Filled"
-                                                  Class="mt-4" Immediate="true" @bind-Value="_guestEmail">
+                                    @if (_userIsGuest)
+                                    {
+                                        <MudTextField T="string" Label="Email Address" Variant="Variant.Filled"
+                                                      Class="mt-4" Immediate="true" @bind-Value="_guestEmail">
 
-                                    </MudTextField>
-                                }
+                                        </MudTextField>
+                                    }
 
-                                @if (_draw?.DrawType == DrawTypeEnum.Raffle)
-                                {
-                                    <MudSelect T="int" Label="Entries" Variant="Variant.Filled" Class="mt-4"
-                                               AnchorOrigin="Origin.BottomCenter" Immediate="true"
-                                               @bind-Value="_selectedNumberOfEntries">
-                                        @for (var i = 1; i <= _availableEntries; i++)
-                                        {
-                                            <MudSelectItem Value="i"/>
-                                        }
-                                    </MudSelect>
-                                }
-                                else
-                                {
-                                    <MudSelect T="int" Label="Lucky Numbers" Variant="Variant.Filled" Value="1" Class="mt-4"
-                                               AnchorOrigin="Origin.BottomCenter" Immediate="true" MultiSelection="true">
-                                        @if (_availableLuckyNumbers != null)
-                                        {
-                                            foreach (var luckyNumber in _availableLuckyNumbers)
+                                    @if (_draw?.DrawType == DrawTypeEnum.Raffle)
+                                    {
+                                        <MudSelect T="int" Label="Entries" Variant="Variant.Filled" Class="mt-4"
+                                                   AnchorOrigin="Origin.BottomCenter" Immediate="true"
+                                                   @bind-Value="_selectedNumberOfEntries">
+                                            @for (var i = 1; i <= _availableEntries; i++)
                                             {
-                                                <MudSelectItem Value="luckyNumber"/>
+                                                <MudSelectItem Value="i"/>
                                             }
-                                        }
-                                    </MudSelect>
-                                }
+                                        </MudSelect>
+                                    }
+                                    else
+                                    {
+                                        <MudSelect T="int" Label="Lucky Numbers" Variant="Variant.Filled" Value="1" Class="mt-4"
+                                                   AnchorOrigin="Origin.BottomCenter" Immediate="true" MultiSelection="true">
+                                            @if (_availableLuckyNumbers != null)
+                                            {
+                                                foreach (var luckyNumber in _availableLuckyNumbers)
+                                                {
+                                                    <MudSelectItem Value="luckyNumber"/>
+                                                }
+                                            }
+                                        </MudSelect>
+                                    }
 
+                                    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Class="mt-4"
+                                               OnClick="@EnterDraw">Enter Draw</MudButton>
+                                }
+                            }
+
+                            @if (_userIsGuest && _draw?.DrawType == DrawTypeEnum.Lottery)
+                            {
                                 <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Class="mt-4"
-                                           OnClick="@EnterDraw">
-                                    Enter Draw
-                                </MudButton>
+                                           Href="/Account/Login">Login to Enter Lottery</MudButton>
                             }
 
                             if (_userEntriesCount > 0)
                             {
                                 <MudButton Variant="Variant.Filled" Color="Color.Error" FullWidth="true" Class="mt-4"
-                                           OnClick="@RemoveUserEntriesWithConfirmation">
-                                    Remove Entries
-                                </MudButton>
+                                           OnClick="@RemoveUserEntriesWithConfirmation">Remove Entries</MudButton>
                             }
                         }
                     </MudPaper>
