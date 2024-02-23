@@ -62,13 +62,19 @@ builder.Services.AddScoped<ISnackbarHelper, SnackbarHelper>();
 
 // Add email service
 var emailConfig = builder.Configuration.GetSection("EmailSettings");
-builder.Services.AddSingleton<IEmailService>(new EmailService(
-    emailConfig["SmtpServer"] ?? string.Empty,
-    int.Parse(emailConfig["SmtpPort"] ?? string.Empty),
-    emailConfig["FromAddress"] ?? string.Empty,
-    emailConfig["SmtpUsername"] ?? string.Empty,
-    emailConfig["SmtpPassword"] ?? string.Empty
-));
+builder.Services.AddSingleton<IEmailService>((serviceProvider) => {
+    var env = serviceProvider.GetRequiredService<IWebHostEnvironment>();
+    var emailTemplatesPath = Path.Combine(env.ContentRootPath, "EmailTemplates");
+
+    return new EmailService(
+        emailConfig["SmtpServer"] ?? string.Empty,
+        int.Parse(emailConfig["SmtpPort"] ?? string.Empty),
+        emailConfig["FromAddress"] ?? string.Empty,
+        emailConfig["SmtpUsername"] ?? string.Empty,
+        emailConfig["SmtpPassword"] ?? string.Empty,
+        emailTemplatesPath
+    );
+});
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
                        throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
