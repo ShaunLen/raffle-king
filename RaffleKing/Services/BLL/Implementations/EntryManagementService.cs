@@ -274,17 +274,21 @@ public class EntryManagementService(IUserService userService, IEntryService entr
 
     public async Task<List<int>> GetAvailableLuckyNumbersByDraw(int drawId)
     {
-        var availableLuckyNumbers = new List<int>();
+        var availableLuckyNumbers = Enumerable.Range(1, 100).ToList();
+        
         var draw = await drawService.GetDrawById(drawId);
         
         if (draw is not { DrawType: DrawTypeEnum.Lottery })
             return availableLuckyNumbers;
+
+        var entries = await entryService.GetEntriesByDraw(drawId);
+        if (entries == null)
+            return availableLuckyNumbers;
         
-        // TODO: Add actual handling
-        for (var i = 1; i < 100; i++)
+        foreach (var luckyNumber in entries.Select(entry => entry.LuckyNumber)
+                     .Where(luckyNumber => availableLuckyNumbers.Contains((int)luckyNumber!)))
         {
-            // Temporarily just add max range of lucky numbers until lottery entry logic is added
-            availableLuckyNumbers.Add(i);
+            availableLuckyNumbers.Remove((int) luckyNumber!);
         }
 
         return availableLuckyNumbers;
