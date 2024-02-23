@@ -133,6 +133,9 @@ public class EntryManagementService(IUserService userService, IEntryService entr
             return canEnter;
 
         luckyNumbers = luckyNumbers.ToList();
+        if (!luckyNumbers.Any())
+            return OperationResult.Fail("At least 1 Lucky Number must be selected.");
+        
         if (luckyNumbers.Count() > await CountCurrentUserEntriesRemainingByDraw(drawId))
             return OperationResult.Fail("Selected number of entries exceeds available entries!");
 
