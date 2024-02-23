@@ -274,9 +274,11 @@ public class EntryManagementService(IUserService userService, IEntryService entr
 
     public async Task<List<int>> GetAvailableLuckyNumbersByDraw(int drawId)
     {
-        var availableLuckyNumbers = Enumerable.Range(1, 100).ToList();
-        
         var draw = await drawService.GetDrawById(drawId);
+        if (draw == null)
+            return [];
+        
+        var availableLuckyNumbers = Enumerable.Range(1, draw.MaxEntriesTotal).ToList();
         
         if (draw is not { DrawType: DrawTypeEnum.Lottery })
             return availableLuckyNumbers;
