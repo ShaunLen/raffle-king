@@ -7,8 +7,8 @@ using RaffleKing.Services.DAL.Interfaces;
 
 namespace RaffleKing.Services.BLL.Implementations;
 
-public class EntryManagementService(IUserService userService, IEntryService entryService, IDrawService drawService)
-    : IEntryManagementService
+public class EntryManagementService(IUserService userService, IEntryService entryService, IDrawService drawService,
+    IEmailService emailService) : IEntryManagementService
 {
     public async Task<OperationResult> TryEnterRaffle(int drawId, int numberOfEntries, string guestEmail = "")
     {
@@ -40,13 +40,17 @@ public class EntryManagementService(IUserService userService, IEntryService entr
 
         if (isGuest)
         {
+            var guestReferenceCode = Guid.NewGuid().ToString("N");
+            
             entries.Add(new EntryModel
             {
                 DrawId = drawId,
                 IsGuest = true,
                 GuestEmail = guestEmail,
-                GuestReferenceCode = Guid.NewGuid().ToString("N")
+                GuestReferenceCode = guestReferenceCode
             });
+
+            emailService.SendGuestEntranceEmail(guestEmail, guestReferenceCode);
         }
         else
         {
