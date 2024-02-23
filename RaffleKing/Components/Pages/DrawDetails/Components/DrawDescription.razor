@@ -1,0 +1,64 @@
+﻿@using RaffleKing.Data.Models
+@using System.Text
+@using RaffleKing.Services.DAL.Interfaces
+@inject IPrizeService PrizeService
+
+<MudItem>
+    <MudContainer MaxWidth="MaxWidth.Small">
+        <MudText Typo="Typo.h6" Color="Color.Primary">ABOUT THIS @Draw?.DrawType.ToString().ToUpper()</MudText>
+        <MudPaper Class="pa-4 border-t-2 mud-border-primary">
+            <MudText Typo="Typo.body1">@Draw?.Description</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Tertiary" Class="mt-2">@_detailsText</MudText>
+            @if (Draw?.DrawType == DrawTypeEnum.Lottery)
+            {
+                <MudText Typo="Typo.body2" Color="Color.Tertiary" Class="mt-2">
+                    In a Lottery, there is no guarantee of a winner. Any lucky number may be drawn, even if that
+                    lucky number has not been selected. In such a case, the prize will not be won by anyone.
+                </MudText>
+            }
+        </MudPaper>
+    </MudContainer>
+</MudItem>
+
+@code {
+    [Parameter] public DrawModel? Draw { get; set; }
+    [Parameter] public List<PrizeModel>? Prizes { get; set; }
+    private string? _detailsText;
+
+    protected override void OnInitialized()
+    {
+        _detailsText = GetDetailsText();
+    }
+
+    private string GetDetailsText()
+    {
+        if (Draw == null)
+            return string.Empty;
+        
+        var numberOfPrizes = Prizes?.Sum(prize => prize.Quantity);
+        var text = new StringBuilder();
+
+        text.Append($"There are a total of {numberOfPrizes} prizes to be won in this {Draw?.DrawType.ToString()}. ");
+
+        if (Draw is { IsBundle: true })
+        {
+            if (Draw.DrawType == DrawTypeEnum.Raffle)
+            {   
+                text.Append("This Raffle is a bundle, so a single winner will be drawn as the recipient of all " +
+                            "prizes - each entry gives you 1 chance to win.");
+            }
+            else
+            {
+                text.Append("This Lottery is a bundle, so a single lucky number will be drawn as the recipient of " +
+                            "all prizes - each entry gives you 1 chance to win.");
+            }
+        }
+        else
+        {
+            text.Append($"A lucky number will be drawn for each prize in this {Draw?.DrawType.ToString()}, " +
+                        $"so each entry gives you {numberOfPrizes} chances to win!");
+        }
+
+        return text.ToString();
+    }
+}

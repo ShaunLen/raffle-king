@@ -1,0 +1,56 @@
+﻿@page "/draws/draw-details/{drawId:int}"
+@using RaffleKing.Services.BLL.Interfaces
+@using RaffleKing.Services.Utilities.Interfaces
+@using RaffleKing.Components.Pages.DrawDetails.Components
+@inject IDrawManagementService DrawManagementService
+@inject IPrizeManagementService PrizeManagementService
+@inject NavigationManager NavigationManager
+@inject ISnackbarHelper SnackbarHelper
+@inject IUserService UserService
+
+<PageTitle>Draw Details</PageTitle>
+
+<MudStack Justify="Justify.Center" Spacing="6">
+    <MudButton OnClick="@(() => NavigationManager.NavigateTo("javascript:history.back()"))"
+               StartIcon="@Icons.Material.Filled.ArrowBack">
+        Go Back
+    </MudButton>
+    @switch (_draw)
+    {
+        case { IsActive: false } when _prizes is { Count: > 0 }:
+            <MudAlert Severity="Severity.Info" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Center">
+                This @_draw.DrawType.ToString() is ready to be published!
+            </MudAlert>
+            break;
+        case {IsActive: false} when _prizes is {Count: 0}:
+            <MudAlert Severity="Severity.Error" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Center">
+                This @_draw.DrawType.ToString() cannot be published until at least 1 prize is added!
+            </MudAlert>
+            break;
+    }
+    <MudText Typo="Typo.h1" Color="@Color.Tertiary" Align="Align.Center">@_draw?.Title</MudText>
+    <MudGrid Justify="Justify.Center" Spacing="0">
+        <DrawDescription Draw="_draw" Prizes="_prizes"/>
+        <MudItem>
+            <MudStack>
+                <DrawInformation Draw="_draw"/>
+                <MudContainer MaxWidth="MaxWidth.ExtraSmall">
+                    <MudText Typo="Typo.h6" Color="Color.Primary" Align="Align.Center">
+                        @(_userIsHost ? "DRAW ACTIONS" : "ENTER DRAW")
+                    </MudText>
+                    <MudPaper Class="pa-4 border-t-2 mud-border-primary">
+                        @if (_userIsHost)
+                        {
+                            <HostActions Draw="_draw" Prizes="_prizes" />
+                        }
+                        else
+                        {
+                            <EnterActions Draw="_draw"/>
+                        }
+                    </MudPaper>
+                </MudContainer>
+            </MudStack>
+        </MudItem>
+    </MudGrid>
+    <PrizeList Draw="_draw" Prizes="_prizes"/>
+</MudStack>

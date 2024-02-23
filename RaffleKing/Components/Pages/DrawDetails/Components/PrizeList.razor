@@ -1,0 +1,65 @@
+﻿@using RaffleKing.Data.Models
+@using RaffleKing.Services.BLL.Implementations
+@using RaffleKing.Services.BLL.Interfaces
+@using RaffleKing.Services.Utilities.Implementations
+@using RaffleKing.Services.Utilities.Interfaces
+@inject IPrizeManagementService PrizeManagementService
+@inject NavigationManager NavigationManager
+@inject ISnackbarHelper SnackbarHelper
+@inject IDialogService DialogService
+
+<MudStack Justify="Justify.Center">
+    <MudText Typo="Typo.h6" Color="Color.Primary" Align="Align.Center">
+        AVAILABLE PRIZES
+    </MudText>
+    <MudGrid Justify="Justify.Center">
+        @if (Prizes != null)
+        {
+            foreach (var prize in Prizes)
+            {
+                <MudItem>
+                    <MudPaper Class="pa-4 border-t-2 mud-border-primary">
+                        <MudText Typo="Typo.h6" Color="Color.Tertiary">@prize.Title</MudText>
+                        <MudText Typo="Typo.body1">@prize.Description</MudText>
+                        <MudText Typo="Typo.button" Color="Color.Primary">Quantity: @prize.Quantity</MudText>
+                        @if (Draw is { IsActive: false })
+                        {
+                            <MudButton Color="Color.Error" Class="pa-0 ml-2"
+                                       OnClick="@(async (_) => await DeletePrizeWithConfirmation(prize.Id))">
+                                Delete Prize
+                            </MudButton>
+                        }
+                    </MudPaper>
+                </MudItem>
+            }
+        }
+        @if (Prizes == null || Prizes.Count == 0)
+        {
+            <MudText Typo="Typo.h6" Align="Align.Center">
+                This @Draw?.DrawType.ToString() does not have any associated prizes. At least one prize must be
+                added before it can be published.
+            </MudText>
+        }
+    </MudGrid>
+</MudStack>
+
+@code {
+    [Parameter] public DrawModel? Draw { get; set; }
+    [Parameter] public List<PrizeModel>? Prizes { get; set; }
+
+    private async Task DeletePrizeWithConfirmation(int prizeId)
+    {
+        // Display confirmation dialog
+        var confirmed = await DialogService.ShowMessageBox(
+            "Delete Prize",
+            "Deletion is permanent! Are you sure?",
+            yesText: "Delete", cancelText: "Cancel");
+
+        if (confirmed == null)
+            return;
+
+        await PrizeManagementService.DeletePrize(prizeId);
+        await SnackbarHelper.QueueSnackbarMessageForReload("PrizeDeleted", "Prize has been deleted!");
+        NavigationManager.NavigateTo(NavigationManager.Uri, true);
+    }
+}

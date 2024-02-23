@@ -1,0 +1,153 @@
+﻿@using RaffleKing.Data.Models
+@using RaffleKing.Services.BLL.Interfaces
+@using RaffleKing.Services.Utilities.Implementations
+@using RaffleKing.Common
+@using RaffleKing.Services.Utilities.Interfaces
+@inject IEntryManagementService EntryManagementService
+@inject NavigationManager NavigationManager
+@inject ISnackbarHelper SnackbarHelper
+@inject IDialogService DialogService
+@inject IUserService UserService
+@inject ISnackbar Snackbar
+
+<MudText Typo="Typo.button" Color="Color.Info">
+    @_percentageEntriesRemaining% Total Entries Remaining
+</MudText>
+<MudProgressLinear Striped="true" Color="Color.Info" Size="Size.Large" Class="mt-0"
+                   Value="@_percentageEntriesRemaining"/>
+@if (!_userIsGuest)
+{
+    <MudText Typo="Typo.body1" Color="Color.Primary" Class="mt-2">
+        You have entered this draw @_userEntriesCount times.
+    </MudText>
+}
+
+@if (!_userIsGuest || Draw?.DrawType == DrawTypeEnum.Raffle)
+{
+    @if (_availableEntries != 0)
+    {
+        @if (_userIsGuest)
+        {
+            <MudTextField T="string" Label="Email Address" Variant="Variant.Filled"
+                          Class="mt-4" Immediate="true" @bind-Value="_guestEmail">
+
+            </MudTextField>
+        }
+
+        @if (Draw?.DrawType == DrawTypeEnum.Raffle)
+        {
+            <MudSelect T="int" Label="Entries" Variant="Variant.Filled" Class="mt-4"
+                       AnchorOrigin="Origin.BottomCenter" Immediate="true"
+                       @bind-Value="_selectedNumberOfEntries">
+                @for (var i = 1; i <= _availableEntries; i++)
+                {
+                    <MudSelectItem Value="i"/>
+                }
+            </MudSelect>
+        }
+        else
+        {
+            <MudSelect T="int" Label="Lucky Numbers" Variant="Variant.Filled" Value="1"
+                       Class="mt-4" AnchorOrigin="Origin.BottomCenter" Immediate="true"
+                       MultiSelection="true" @bind-SelectedValues="_selectedLuckyNumbers">
+                @if (_availableLuckyNumbers != null)
+                {
+                    foreach (var luckyNumber in _availableLuckyNumbers)
+                    {
+                        <MudSelectItem Value="luckyNumber"/>
+                    }
+                }
+            </MudSelect>
+        }
+
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Class="mt-4"
+                   OnClick="@EnterDraw">Enter Draw</MudButton>
+    }
+}
+
+@if (_userIsGuest && Draw?.DrawType == DrawTypeEnum.Lottery)
+{
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Class="mt-4"
+               Href="/Account/Login">Login to Enter Lottery</MudButton>
+}
+
+@if (_userEntriesCount > 0)
+{
+    <MudButton Variant="Variant.Filled" Color="Color.Error" FullWidth="true" Class="mt-4"
+               OnClick="@RemoveUserEntriesWithConfirmation">Remove Entries</MudButton>
+}
+
+@code {
+    [Parameter] public DrawModel? Draw { get; set; }
+    private double _percentageEntriesRemaining;
+    private bool _userIsGuest;
+    private int _userEntriesCount;
+    private int _availableEntries;
+    private List<int>? _availableLuckyNumbers;
+    private string _guestEmail = string.Empty;
+    private int _selectedNumberOfEntries = 1;
+    private IEnumerable<int> _selectedLuckyNumbers = new List<int>();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Console.WriteLine("\n\n\n\nCHECKING IF NULL\n\n\n\n");
+        if (Draw == null)
+            return;
+
+        Console.WriteLine("\n\n\n\nNOT NULL\n\n\n\n");
+
+        _percentageEntriesRemaining = await EntryManagementService.GetPercentageEntriesRemainingByDraw(Draw.Id);
+        _userEntriesCount = await EntryManagementService.CountCurrentUserEntriesByDraw(Draw.Id);
+        _availableEntries = await EntryManagementService.CountCurrentUserEntriesRemainingByDraw(Draw.Id);
+        _availableLuckyNumbers = await EntryManagementService.GetAvailableLuckyNumbersByDraw(Draw.Id);
+        _userIsGuest = await UserService.IsGuest();
+    }
+
+    private async Task EnterDraw()
+    {
+        OperationResult result;
+        switch (Draw?.DrawType)
+        {
+            case DrawTypeEnum.Raffle:
+                result = await EntryManagementService.TryEnterRaffle(Draw.Id, _selectedNumberOfEntries, _guestEmail);
+                break;
+            case DrawTypeEnum.Lottery:
+                result = await EntryManagementService.TryEnterLottery(Draw.Id, _selectedLuckyNumbers);
+                break;
+            default:
+                return;
+        }
+
+        if (!result.Success)
+        {
+            Snackbar.Add(result.Message, Severity.Error);
+            return;
+        }
+
+        if(_userIsGuest)
+            await SnackbarHelper.QueueSnackbarMessageForReload("EnteredDraw", "Draw entered as guest!");
+        else
+            await SnackbarHelper.QueueSnackbarMessageForReload("EnteredDraw", "Draw entered!");
+        NavigationManager.NavigateTo(NavigationManager.Uri, true);
+    }
+
+    private async Task RemoveUserEntriesWithConfirmation()
+    {
+        if(Draw == null)
+            return;
+
+        // Display confirmation dialog
+        var confirmed = await DialogService.ShowMessageBox(
+            "Remove Entries",
+            "All of your entries for this draw will be removed! Are you sure?",
+            yesText: "Remove", cancelText: "Cancel");
+
+        if (confirmed == null)
+            return;
+
+        await EntryManagementService.RemoveCurrentUserEntriesByDraw(Draw.Id);
+        await SnackbarHelper.QueueSnackbarMessageForReload("RemovedEntries",
+            "You have removed your entries for this draw!");
+        NavigationManager.NavigateTo(NavigationManager.Uri, true);
+    }
+}

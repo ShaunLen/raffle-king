@@ -1,0 +1,101 @@
+﻿@using RaffleKing.Data.Models
+@using RaffleKing.Services.BLL.Implementations
+@using RaffleKing.Services.Utilities.Interfaces
+@using RaffleKing.Components.Shared
+@using RaffleKing.Services.BLL.Interfaces
+@inject IPrizeManagementService PrizeManagementService
+@inject IDrawManagementService DrawManagementService
+@inject NavigationManager NavigationManager
+@inject ISnackbarHelper SnackbarHelper
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+@if (Draw is { IsActive: false })
+{
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Class="mb-4"
+               OnClick="@AddPrize">
+        Add Prize
+    </MudButton>
+}
+
+@if (Prizes is { Count: > 0 } && Draw is { IsActive: false })
+{
+    <MudButton Variant="Variant.Filled" Color="Color.Info" FullWidth="true" Class="mb-4"
+               OnClick="@PublishDrawWithConfirmation">
+        Publish Draw
+    </MudButton>
+}
+
+<MudButton Variant="Variant.Filled" Color="Color.Error" FullWidth="true"
+           OnClick="@DeleteDrawWithConfirmation">
+    Delete Draw
+</MudButton>
+
+@code {
+    [Parameter] public DrawModel? Draw { get; set; }
+    [Parameter] public List<PrizeModel>? Prizes { get; set; }
+
+    private async Task AddPrize()
+    {
+        if (Draw == null)
+            return;
+
+        var parameters = new DialogParameters
+        {
+            { "DrawId", Draw.Id }
+        };
+        var dialog = await DialogService.ShowAsync<AddPrize>("Add Prize", parameters);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            if (result.Data is PrizeModel prize) await PrizeManagementService.AddNewPrize(prize);
+            await SnackbarHelper.QueueSnackbarMessageForReload("PrizeAdded", "Prize has been added!");
+            NavigationManager.NavigateTo(NavigationManager.Uri, true);
+        }
+    }
+
+    private async Task PublishDrawWithConfirmation()
+    {
+        if (Draw == null)
+            return;
+
+        // Display confirmation dialog
+        var confirmed = await DialogService.ShowMessageBox(
+            "Publish Draw",
+            "Once published, the draw will no longer be editable and will be open to entries. Are you sure?",
+            yesText: "Publish", cancelText: "Cancel");
+
+        if (confirmed == null) return;
+
+        var result = await DrawManagementService.ActivateDraw(Draw.Id);
+
+        if (!result.Success)
+        {
+            Snackbar.Add(result.Message, Severity.Error);
+            return;
+        }
+
+        await SnackbarHelper.QueueSnackbarMessageForReload("DrawPublished", "Draw has been published!");
+        NavigationManager.NavigateTo(NavigationManager.Uri, true);
+    }
+
+    private async Task DeleteDrawWithConfirmation()
+    {
+        if (Draw == null)
+            return;
+
+        // Display confirmation dialog
+        var confirmed = await DialogService.ShowMessageBox(
+            "Delete Draw",
+            "Deletion is permanent! All associated prizes and entries will also be deleted and no winners " +
+            "will be drawn. Are you sure?",
+            yesText: "Delete", cancelText: "Cancel");
+
+        if (confirmed == null) return;
+
+        await DrawManagementService.DeleteDraw(Draw.Id);
+        NavigationManager.NavigateTo("/draws/my-draws");
+        Snackbar.Add("Draw deleted successfully", Severity.Success);
+    }
+}

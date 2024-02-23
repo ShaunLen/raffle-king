@@ -1,0 +1,39 @@
+﻿@using RaffleKing.Data.Models
+<MudContainer MaxWidth="MaxWidth.ExtraSmall">
+    <MudText Typo="Typo.h6" Color="Color.Primary" Align="Align.Center">
+        DRAW DETAILS
+    </MudText>
+    <MudPaper Class="pa-4 border-t-2 mud-border-primary">
+        <MudGrid Justify="Justify.Center">
+            <MudItem>
+                <MudStack AlignItems="AlignItems.Center" Spacing="0">
+                    <MudIcon Icon="@Icons.Material.Filled.AccountCircle" Size="Size.Large" Class="mb-2"/>
+                    <MudText Typo="Typo.button" Align="Align.Center" Style="line-height: 1.2">
+                        @Draw?.MaxEntriesPerUser max<br/>per person
+                    </MudText>
+                </MudStack>
+            </MudItem>
+            <MudItem>
+                <MudStack AlignItems="AlignItems.Center" Spacing="0">
+                    <MudIcon Icon="@Icons.Material.Filled.CalendarMonth" Size="Size.Large" Class="mb-2"/>
+                    <MudText Typo="Typo.button" Align="Align.Center" Style="line-height: 1.2">
+                        Draw date:<br/>@Draw?.DrawDate.ToShortDateString()
+                    </MudText>
+                </MudStack>
+            </MudItem>
+            <MudItem>
+                <MudStack AlignItems="AlignItems.Center" Spacing="0">
+                    <MudIcon Icon="@Icons.Material.Filled.LocalActivity" Size="Size.Large" Class="mb-2"/>
+                    <MudText Typo="Typo.button" Align="Align.Center" Style="line-height: 1.2">
+                        @Draw?.MaxEntriesTotal<br/>total
+                        @(Draw?.DrawType == DrawTypeEnum.Raffle ? "tickets" : "entries")
+                    </MudText>
+                </MudStack>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    [Parameter] public DrawModel? Draw { get; set; }
+}
