@@ -1,11 +1,11 @@
 ﻿@page "/draws/new-draw"
 @using RaffleKing.Data.Models
 @using Microsoft.AspNetCore.Authorization
-@using RaffleKing.Services.DAL.Interfaces
-@inject AuthenticationStateProvider AuthenticationStateProvider
-@inject IDrawService DrawService
-@inject ISnackbar Snackbar
+@using RaffleKing.Services.BLL.Interfaces
+@inject IDrawManagementService DrawManagementService
 @inject NavigationManager NavigationManager
+@inject IUserService UserService
+@inject ISnackbar Snackbar
 @attribute [Authorize(Roles="Host, Admin")]
 
 <PageTitle>New Draw</PageTitle>
@@ -34,9 +34,9 @@
                         <MudRadio T="bool" Value="false">No</MudRadio>
                     </MudRadioGroup>
                     <MudNumericField @bind-Value="_maxEntriesTotal" Label="Max Entries Total" Variant="Variant.Text" 
-                                     Min="1" Max="99"/>
+                                     Min="1" Max="100"/>
                     <MudNumericField @bind-Value="_maxEntriesPerUser" Label="Max Entries Per User" Variant="Variant.Text" 
-                                     Min="1" Max="99"/>
+                                     Min="1" Max="100"/>
                     <MudDatePicker @bind-Date="_drawDate" Label="Draw Date"/>
                     <MudTimePicker @bind-Time="_drawTime" Label="Draw Time"/>
                     <MudButton OnClick="@OnSubmit" Class="mt-8" FullWidth="true" 
@@ -55,7 +55,7 @@
                 <br/>
                 <MudText Typo="Typo.button">How do I add prizes?</MudText>
                 <MudText Typo="Typo.subtitle2">Upon creating the draw, you will be redirected to the draw page.<br/>
-                    You will be able to add, edit and remove prizes from there.</MudText>
+                    You will be able to configure prizes from there.</MudText>
             </MudPaper>
         </MudItem>
     </MudGrid>

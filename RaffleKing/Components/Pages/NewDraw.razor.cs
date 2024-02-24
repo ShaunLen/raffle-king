@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using MudBlazor;
+﻿using MudBlazor;
 using RaffleKing.Data.Models;
 
 namespace RaffleKing.Components.Pages;
@@ -20,33 +19,43 @@ public partial class NewDraw
     {
         if (_title is null || _description is null)
             return;
-        
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        var userId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        if (userId == null)
+
+        if (_drawDate is null || _drawTime is null)
         {
-            Snackbar.Add("User must be logged in to create a draw.", Severity.Error);
+            Snackbar.Add("You must specify a draw date and time.", Severity.Error);
+            return;
+        }
+
+        var hostId = await UserService.GetUserId();
+        if (hostId == null)
+        {
+            Snackbar.Add("Invalid user.", Severity.Error);
             return;
         }
         
-        var newDraw = new DrawModel()
+        var newDraw = new DrawModel
         {
             Title = _title,
             Description = _description,
-            DrawDate = _drawDate!.Value.Add((TimeSpan) _drawTime!),
+            DrawDate = _drawDate.Value.Add((TimeSpan) _drawTime),
             DrawType =_drawType,
             IsBundle = _isBundle,
             MaxEntriesTotal = _maxEntriesTotal,
             MaxEntriesPerUser = _maxEntriesPerUser,
-            DrawHostId = userId
+            DrawHostId = hostId
         };
             
         try
         {
-            var drawId = await DrawService.AddNewDraw(newDraw);
+            var result = await DrawManagementService.AddNewDraw(newDraw);
+            if (!result.Success)
+            {
+                Snackbar.Add(result.Message, Severity.Error);
+                return;
+            }
+            
             Snackbar.Add("Draw created successfully.", Severity.Success);
-            NavigationManager.NavigateTo($"/draws/draw-details/{drawId}");
+            NavigationManager.NavigateTo($"/draws/draw-details/{result.Data}");
         }
         catch (Exception exception)
         {
