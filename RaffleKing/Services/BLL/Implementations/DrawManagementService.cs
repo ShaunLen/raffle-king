@@ -9,6 +9,24 @@ public class DrawManagementService(IDrawService drawService, IPrizeManagementSer
     IPrizeService prizeService, IEntryService entryService) 
     : IDrawManagementService
 {
+    public async Task<OperationResult<int>> AddNewDraw(DrawModel draw)
+    {
+        if(draw.Title.Length > 30)
+            return OperationResult<int>.Fail("Title cannot exceed 30 characters.", 0);
+        
+        if(draw.Description.Length > 500)
+            return OperationResult<int>.Fail("Description cannot exceed 500 characters.", 0);
+
+        if (draw.MaxEntriesPerUser > draw.MaxEntriesTotal)
+            return OperationResult<int>.Fail("Max Entries Per User cannot exceed Max Entries Total.", 0);
+
+        if (draw.DrawDate < DateTime.Now)
+            return OperationResult<int>.Fail("Draw must be scheduled for some time in the future.", 0);
+        
+        var drawId = await drawService.AddNewDraw(draw);
+        return OperationResult<int>.Ok(drawId);
+    }
+
     public async Task<DrawModel?> GetDrawById(int drawId)
     {
         return await drawService.GetDrawById(drawId);
