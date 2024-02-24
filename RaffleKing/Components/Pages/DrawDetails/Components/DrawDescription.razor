@@ -25,7 +25,7 @@
     [Parameter] public List<PrizeModel>? Prizes { get; set; }
     private string? _detailsText;
 
-    protected override void OnInitialized()
+    protected override void OnParametersSet()
     {
         _detailsText = GetDetailsText();
     }
@@ -34,16 +34,16 @@
     {
         if (Draw == null)
             return string.Empty;
-        
+
         var numberOfPrizes = Prizes?.Sum(prize => prize.Quantity);
         var text = new StringBuilder();
 
-        text.Append($"There are a total of {numberOfPrizes} prizes to be won in this {Draw?.DrawType.ToString()}. ");
+        text.Append($"There is a total of {numberOfPrizes} prize(s) to be won in this {Draw?.DrawType.ToString()}. ");
 
         if (Draw is { IsBundle: true })
         {
             if (Draw.DrawType == DrawTypeEnum.Raffle)
-            {   
+            {
                 text.Append("This Raffle is a bundle, so a single winner will be drawn as the recipient of all " +
                             "prizes - each entry gives you 1 chance to win.");
             }
@@ -55,7 +55,7 @@
         }
         else
         {
-            text.Append($"A lucky number will be drawn for each prize in this {Draw?.DrawType.ToString()}, " +
+            text.Append($"A winner will be drawn for each prize in this {Draw?.DrawType.ToString()}, " +
                         $"so each entry gives you {numberOfPrizes} chances to win!");
         }
 
