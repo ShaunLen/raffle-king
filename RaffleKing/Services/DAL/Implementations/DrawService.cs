@@ -6,7 +6,8 @@ using RaffleKing.Services.DAL.Interfaces;
 
 namespace RaffleKing.Services.DAL.Implementations;
 
-public class DrawService(IDbContextFactory<ApplicationDbContext> factory, IHttpContextAccessor httpContextAccessor) : IDrawService
+public class DrawService(IDbContextFactory<ApplicationDbContext> factory, IHttpContextAccessor httpContextAccessor) 
+    : IDrawService
 {
     /* Create Operations */
     public async Task<int> AddNewDraw(DrawModel drawModel)
