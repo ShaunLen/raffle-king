@@ -90,6 +90,9 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        if (Draw == null)
+            return;
+
         _percentageEntriesRemaining = await EntryManagementService.GetPercentageEntriesRemainingByDraw(Draw.Id);
         _userEntriesCount = await EntryManagementService.CountCurrentUserEntriesByDraw(Draw.Id);
         _availableEntries = await EntryManagementService.CountCurrentUserEntriesRemainingByDraw(Draw.Id);
