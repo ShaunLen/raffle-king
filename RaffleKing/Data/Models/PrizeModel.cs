@@ -24,7 +24,6 @@ public class PrizeModel
     /// </summary>
     [Required]
     [StringLength(500)]
-
     public string Description { get; init; } = null!;
 
     /// <summary>
