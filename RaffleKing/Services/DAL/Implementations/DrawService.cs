@@ -37,19 +37,13 @@ public class DrawService(IDbContextFactory<ApplicationDbContext> factory, IHttpC
         await using var context = await factory.CreateDbContextAsync();
         return await context.Draws.ToListAsync();
     }
-
-    public async Task<List<DrawModel>?> GetHostedDraws()
+    
+    public async Task<List<DrawModel>?> GetDrawsByHostId(string hostUserId)
     {
         await using var context = await factory.CreateDbContextAsync();
-        var hostId = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (hostId == null)
-            return null;
-
-        var draws = await context.Draws
-            .Where(draw => draw.DrawHostId == hostId)
+        return await context.Draws
+            .Where(draw => draw.DrawHostId == hostUserId)
             .ToListAsync();
-
-        return draws;
     }
 
     public async Task<List<DrawModel>?> GetActiveDraws()

@@ -11,7 +11,7 @@ public interface IDrawService
     public Task<DrawModel?> GetDrawById(int drawId);
     public Task<List<DrawModel>?> GetDrawsByIds(List<int> drawIds);
     public Task<List<DrawModel>?> GetAllDraws();
-    public Task<List<DrawModel>?> GetHostedDraws();
+    public Task<List<DrawModel>?> GetDrawsByHostId(string hostUserId);
     public Task<List<DrawModel>?> GetActiveDraws();
     
     /* Update Operations */
