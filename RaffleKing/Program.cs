@@ -51,11 +51,13 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDrawManagementService, DrawManagementService>();
 builder.Services.AddScoped<IPrizeManagementService, PrizeManagementService>();
 builder.Services.AddScoped<IEntryManagementService, EntryManagementService>();
+builder.Services.AddScoped<IDrawExecutionService, DrawExecutionService>();
 
 // Add DAL services
 builder.Services.AddScoped<IDrawService, DrawService>();
 builder.Services.AddScoped<IPrizeService, PrizeService>();
 builder.Services.AddScoped<IEntryService, EntryService>();
+builder.Services.AddScoped<IWinnerService, WinnerService>();
 
 // Add utility services
 builder.Services.AddScoped<ISnackbarHelper, SnackbarHelper>();
