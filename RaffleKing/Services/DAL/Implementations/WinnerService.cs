@@ -14,4 +14,12 @@ public class WinnerService(IDbContextFactory<ApplicationDbContext> factory, IHtt
         context.Winners.Add(winnerModel);
         await context.SaveChangesAsync();
     }
+
+    public async Task<List<WinnerModel>?> GetWinnersByDraw(int drawId)
+    {
+        await using var context = await factory.CreateDbContextAsync();
+        return await context.Winners
+            .Where(winner => winner.Entry != null && winner.Entry.DrawId == drawId)
+            .ToListAsync();
+    }
 }
