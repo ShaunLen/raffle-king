@@ -13,10 +13,10 @@ public class WinnerModel
     public int Id { get; private init; }
     
     /// <summary>
-    /// The identifier of the winning entry.
+    /// (Nullable) The identifier of the winning entry.
     /// </summary>
     [ForeignKey(nameof(Entry))]
-    public int DrawId { get; init; }
+    public int? EntryId { get; set; }
     
     /// <summary>
     /// The identifier of the prize won.
