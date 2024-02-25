@@ -26,7 +26,7 @@ public partial class DrawCard
 
     protected override async Task OnInitializedAsync()
     {
-        _draw = await DrawService.GetDrawById(DrawId);
+        _draw = await DrawManagementService.GetDrawById(DrawId);
 
         if (_draw is null) return;
         
@@ -37,7 +37,6 @@ public partial class DrawCard
         // Restrict description displayed to 100 characters.
         _description = _draw.Description.Length > 100 ? $"{_draw.Description[..100]}..." : _draw.Description;
 
-        // Conditional text for the button on the card
         _buttonText = ListType switch
         {
             DrawListType.ActiveDraws => "View Draw",
@@ -60,28 +59,17 @@ public partial class DrawCard
         var weekEnd = weekStart.AddDays(7);
 
         if (date.Date == today)
-        {
             return date < DateTime.Now ? "Expired" : "Today";
-        }
-        else if (date.Date < today)
-        {
+        
+        if (date.Date < today)
             return "Expired";
-        }
-        else if (date.Date == today.AddDays(1))
-        {
+        
+        if (date.Date == today.AddDays(1))
             return "Tomorrow";
-        }
-        else if (date > weekStart && date < weekEnd)
-        {
+        
+        if (date > weekStart && date < weekEnd)
             return date.ToString("dddd");
-        }
-        else if (date.Year == today.Year)
-        {
-            return date.ToString("MMMM d");
-        }
-        else
-        {
-            return date.ToString("MMMM d, yyyy");
-        }
+
+        return date.ToString(date.Year == today.Year ? "MMMM d" : "MMMM d, yyyy");
     }
 }
