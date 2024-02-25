@@ -10,6 +10,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<DrawModel> Draws { get; set; }
     public DbSet<PrizeModel> Prizes { get; set; }
     public DbSet<EntryModel> Entries { get; set; }
+    public DbSet<WinnerModel> Winners { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -19,5 +20,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         builder.Entity<DrawModel>().ToTable("Draw");
         builder.Entity<PrizeModel>().ToTable("Prize");
         builder.Entity<EntryModel>().ToTable("Entry");
+        builder.Entity<WinnerModel>().ToTable("Winner");
     }
 }
