@@ -12,7 +12,7 @@ using RaffleKing.Data;
 namespace RaffleKing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240225211045_Initial")]
+    [Migration("20240225232259_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -246,10 +246,13 @@ namespace RaffleKing.Migrations
                     b.Property<int>("DrawType")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsActive")
+                    b.Property<bool>("IsBundle")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsBundle")
+                    b.Property<bool>("IsFinished")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsPublished")
                         .HasColumnType("bit");
 
                     b.Property<int>("MaxEntriesPerUser")

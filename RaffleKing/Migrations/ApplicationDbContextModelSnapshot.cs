@@ -243,10 +243,13 @@ namespace RaffleKing.Migrations
                     b.Property<int>("DrawType")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsActive")
+                    b.Property<bool>("IsBundle")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsBundle")
+                    b.Property<bool>("IsFinished")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsPublished")
                         .HasColumnType("bit");
 
                     b.Property<int>("MaxEntriesPerUser")
