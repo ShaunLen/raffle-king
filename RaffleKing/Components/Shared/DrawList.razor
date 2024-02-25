@@ -1,6 +1,8 @@
 ﻿@using RaffleKing.Data.Models
+@using RaffleKing.Services.BLL.Interfaces
 @using RaffleKing.Services.DAL.Interfaces
-@inject IDrawService DrawService
+@inject IDrawManagementService DrawManagementService
+@inject IEntryManagementService EntryManagementService
 
 <MudStack AlignItems="AlignItems.Center">
     <MudText Typo="Typo.h1"><span style="color: #0bba83">@_headingPrefix</span> Draws</MudText>

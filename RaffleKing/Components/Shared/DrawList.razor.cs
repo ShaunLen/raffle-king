@@ -28,14 +28,15 @@ public partial class DrawList
         switch (ListType)
         {
             case DrawListType.ActiveDraws:
-                _draws = await DrawService.GetActiveDraws();
+                _draws = await DrawManagementService.GetActiveDraws();
                 _headingPrefix = "Active";
                 break;
             case DrawListType.HostedDraws:
-                _draws = await DrawService.GetHostedDraws();
+                _draws = await DrawManagementService.GetDrawsHostedByCurrentUser();
                 _headingPrefix = "My";
                 break;
             case DrawListType.EnteredDraws:
+                _draws = await EntryManagementService.GetDrawsEnteredByCurrentUser();
                 _headingPrefix = "Entered";
                 break;
             default:
