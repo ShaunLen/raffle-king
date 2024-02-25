@@ -7,6 +7,7 @@ public interface IDrawManagementService
 {
     Task<OperationResult<int>> AddNewDraw(DrawModel draw);
     Task<DrawModel?> GetDrawById(int drawId);
+    Task<List<WinnerModel>?> GetWinnersByDraw(int drawId);
     Task<List<DrawModel>?> GetActiveDraws();
     Task<List<DrawModel>?> GetDrawsHostedByCurrentUser();
     Task<OperationResult> ActivateDraw(int drawId);

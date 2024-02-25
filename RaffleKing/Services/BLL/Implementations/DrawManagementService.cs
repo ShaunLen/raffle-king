@@ -6,7 +6,7 @@ using RaffleKing.Services.DAL.Interfaces;
 namespace RaffleKing.Services.BLL.Implementations;
 
 public class DrawManagementService(IDrawService drawService, IPrizeService prizeService, IEntryService entryService, 
-    IUserService userService) : IDrawManagementService
+    IUserService userService, IWinnerService winnerService) : IDrawManagementService
 {
     public async Task<OperationResult<int>> AddNewDraw(DrawModel draw)
     {
@@ -29,6 +29,11 @@ public class DrawManagementService(IDrawService drawService, IPrizeService prize
     public async Task<DrawModel?> GetDrawById(int drawId)
     {
         return await drawService.GetDrawById(drawId);
+    }
+
+    public async Task<List<WinnerModel>?> GetWinnersByDraw(int drawId)
+    {
+        return await winnerService.GetWinnersByDraw(drawId);
     }
 
     public async Task<List<DrawModel>?> GetActiveDraws()
