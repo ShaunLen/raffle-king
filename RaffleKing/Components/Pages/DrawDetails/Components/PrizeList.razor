@@ -22,7 +22,7 @@
                         <MudText Typo="Typo.h6" Color="Color.Tertiary">@prize.Title</MudText>
                         <MudText Typo="Typo.body1">@prize.Description</MudText>
                         <MudText Typo="Typo.button" Color="Color.Primary">Quantity: @prize.Quantity</MudText>
-                        @if (Draw is { IsActive: false })
+                        @if (Draw is { IsPublished: false })
                         {
                             <MudButton Color="Color.Error" Class="pa-0 ml-2"
                                        OnClick="@(async (_) => await DeletePrizeWithConfirmation(prize.Id))">

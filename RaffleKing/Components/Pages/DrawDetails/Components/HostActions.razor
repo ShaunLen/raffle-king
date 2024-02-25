@@ -5,12 +5,13 @@
 @using RaffleKing.Services.BLL.Interfaces
 @inject IPrizeManagementService PrizeManagementService
 @inject IDrawManagementService DrawManagementService
+@inject IDrawExecutionService DrawExecutionService
 @inject NavigationManager NavigationManager
 @inject ISnackbarHelper SnackbarHelper
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 
-@if (Draw is { IsActive: false })
+@if (Draw is { IsPublished: false })
 {
     <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Class="mb-4"
                OnClick="@AddPrize">
@@ -18,16 +19,19 @@
     </MudButton>
 }
 
-@if (Prizes is { Count: > 0 } && Draw is { IsActive: false })
+@if (Prizes is { Count: > 0 } && Draw is { IsPublished: false })
 {
     <MudButton Variant="Variant.Filled" Color="Color.Info" FullWidth="true" Class="mb-4"
-               OnClick="@PublishDrawWithConfirmation">
-        Publish Draw
-    </MudButton>
+               OnClick="@PublishDrawWithConfirmation">Publish Draw</MudButton>
 }
 
-<MudButton Variant="Variant.Filled" Color="Color.Error" FullWidth="true"
-           OnClick="@DeleteDrawWithConfirmation">
+@if (Draw is { IsPublished: true })
+{
+    <MudButton Variant="Variant.Filled" Color="Color.Info" FullWidth="true" Class="mb-4"
+               OnClick="@ExecuteDraw">Execute Draw</MudButton>
+}
+
+<MudButton Variant="Variant.Filled" Color="Color.Error" FullWidth="true" OnClick="@DeleteDrawWithConfirmation">
     Delete Draw
 </MudButton>
 
@@ -97,5 +101,14 @@
         await DrawManagementService.DeleteDraw(Draw.Id);
         NavigationManager.NavigateTo("/draws/my-draws");
         Snackbar.Add("Draw deleted successfully", Severity.Success);
+    }
+
+    private async Task ExecuteDraw()
+    {
+        if (Draw == null)
+            return;
+
+        await DrawExecutionService.ExecuteDraw(Draw.Id);
+        Snackbar.Add("Draw executed.", Severity.Success);
     }
 }

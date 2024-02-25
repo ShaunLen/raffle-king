@@ -22,6 +22,8 @@ public class DrawExecutionService(IDrawService drawService, IEntryService entryS
         if (prizes == null)
             return;
 
+        await drawService.DeactivateDraw(drawId);
+
         var entries = await entryService.GetEntriesByDraw(drawId);
         if (entries == null)
             return;

@@ -50,7 +50,7 @@ public class DrawService(IDbContextFactory<ApplicationDbContext> factory, IHttpC
     public async Task<List<DrawModel>?> GetActiveDraws()
     {
         await using var context = await factory.CreateDbContextAsync();
-        return await context.Draws.Where(draw => draw.IsActive).ToListAsync();
+        return await context.Draws.Where(draw => draw.IsPublished && !draw.IsFinished).ToListAsync();
     }
 
     /* Update Operations */
@@ -67,7 +67,7 @@ public class DrawService(IDbContextFactory<ApplicationDbContext> factory, IHttpC
         var draw = await context.Draws.FindAsync(drawId);
         if (draw != null)
         {
-            draw.IsActive = true;
+            draw.IsPublished = true;
             await context.SaveChangesAsync();
         }
     }
@@ -78,7 +78,7 @@ public class DrawService(IDbContextFactory<ApplicationDbContext> factory, IHttpC
         var draw = await context.Draws.FindAsync(drawId);
         if (draw != null)
         {
-            draw.IsActive = false;
+            draw.IsFinished = false;
             await context.SaveChangesAsync();
         }
     }

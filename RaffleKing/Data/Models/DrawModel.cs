@@ -39,11 +39,16 @@ public class DrawModel
     public DateTime DrawDate { get; set; }
 
     /// <summary>
-    /// Whether the draw is active or not. Set to false by default. Should be set to true when the draw is
-    /// published (after prizes are added) then set to false again when winners have been drawn.
+    /// Whether the draw has been published or not. Set to false by default.
     /// </summary>
     [Required] 
-    public bool IsActive { get; set; } = false; 
+    public bool IsPublished { get; set; } = false; 
+    
+    /// <summary>
+    /// Whether the draw has been drawn or not. Set to false by default.
+    /// </summary>
+    [Required] 
+    public bool IsFinished { get; set; } = false; 
     
     /// <summary>
     /// Indicates whether the draw is a bundle (single winner drawn for all prizes) or not (individual winner drawn

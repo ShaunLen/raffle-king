@@ -17,12 +17,12 @@
     </MudButton>
     @switch (_draw)
     {
-        case { IsActive: false } when _prizes is { Count: > 0 }:
+        case { IsPublished: false } when _prizes is { Count: > 0 }:
             <MudAlert Severity="Severity.Info" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Center">
                 This @_draw.DrawType.ToString() is ready to be published!
             </MudAlert>
             break;
-        case {IsActive: false} when _prizes is {Count: 0}:
+        case {IsPublished: false} when _prizes is {Count: 0}:
             <MudAlert Severity="Severity.Error" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Center">
                 This @_draw.DrawType.ToString() cannot be published until at least 1 prize is added!
             </MudAlert>
