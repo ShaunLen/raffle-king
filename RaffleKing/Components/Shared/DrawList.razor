@@ -27,13 +27,14 @@
     {
         <MudGrid Justify="Justify.Center" Spacing="8">
             @* Display active Raffles *@
-            @if (_draws.Any(draw => draw is { DrawType: DrawTypeEnum.Raffle, IsActive: true }))
+            @if (_draws.Any(draw => draw is { DrawType: DrawTypeEnum.Raffle, IsPublished: true, IsFinished: false }))
             {
                 <MudItem>
                     <MudStack Justify="Justify.Center">
                         <MudText Typo="Typo.h5" Align="Align.Center" Color="Color.Primary"><b>RAFFLES</b></MudText>
                         @foreach (var draw in _draws.Where(
-                                      draw => draw is { DrawType: DrawTypeEnum.Raffle, IsActive: true }))
+                                      draw => draw is { DrawType: DrawTypeEnum.Raffle, IsPublished: true, 
+                                          IsFinished: false }))
                         {
                             <DrawCard DrawId="draw.Id" ListType="@ListType"/>
                         }
@@ -41,13 +42,14 @@
                 </MudItem>
             }
             @* Display active Lotteries *@
-            @if (_draws.Any(draw => draw is { DrawType: DrawTypeEnum.Lottery, IsActive: true }))
+            @if (_draws.Any(draw => draw is { DrawType: DrawTypeEnum.Lottery, IsPublished: true, IsFinished: false }))
             {
                 <MudItem>
                     <MudStack Justify="Justify.Center">
                         <MudText Typo="Typo.h5" Align="Align.Center" Color="Color.Primary"><b>LOTTERIES</b></MudText>
                         @foreach (var draw in _draws.Where(
-                                      draw => draw is { DrawType: DrawTypeEnum.Lottery, IsActive: true }))
+                                      draw => draw is { DrawType: DrawTypeEnum.Lottery, IsPublished: true, 
+                                          IsFinished: false }))
                         {
                             <DrawCard DrawId="draw.Id" ListType="@ListType"/>
                         }
@@ -57,13 +59,17 @@
             @if (ListType != DrawListType.ActiveDraws)
             {
                 @* Display inactive Raffles *@
-                @if (_draws.Any(draw => draw is { DrawType: DrawTypeEnum.Raffle, IsActive: false }))
+                @if (_draws.Any(draw => draw is { DrawType: DrawTypeEnum.Raffle, IsPublished: false} or 
+                         { DrawType: DrawTypeEnum.Raffle, IsFinished: true}))
                 {
                     <MudItem>
                         <MudStack Justify="Justify.Center">
-                            <MudText Typo="Typo.h5" Align="Align.Center" Color="Color.Primary"><b>INACTIVE RAFFLES</b></MudText>
+                            <MudText Typo="Typo.h5" Align="Align.Center" Color="Color.Primary"><b>
+                                INACTIVE RAFFLES
+                            </b></MudText>
                             @foreach (var draw in _draws.Where(
-                                          draw => draw is { DrawType: DrawTypeEnum.Raffle, IsActive: false }))
+                                          draw => draw is { DrawType: DrawTypeEnum.Raffle, IsPublished: false} or 
+                                              { DrawType: DrawTypeEnum.Raffle, IsFinished: true}))
                             {
                                 <DrawCard DrawId="draw.Id" ListType="@ListType"/>
                             }
@@ -71,13 +77,17 @@
                     </MudItem>
                 }
                 @* Display inactive Lotteries *@
-                @if (_draws.Any(draw => draw is { DrawType: DrawTypeEnum.Lottery, IsActive: false }))
+                @if (_draws.Any(draw => draw is { DrawType: DrawTypeEnum.Lottery, IsPublished: false} or 
+                         { DrawType: DrawTypeEnum.Lottery, IsFinished: true}))
                 {
                     <MudItem>
                         <MudStack Justify="Justify.Center">
-                            <MudText Typo="Typo.h5" Align="Align.Center" Color="Color.Primary"><b>INACTIVE LOTTERIES</b></MudText>
+                            <MudText Typo="Typo.h5" Align="Align.Center" Color="Color.Primary"><b>
+                                INACTIVE LOTTERIES
+                            </b></MudText>
                             @foreach (var draw in _draws.Where(
-                                          draw => draw is { DrawType: DrawTypeEnum.Lottery, IsActive: false }))
+                                          draw => draw is { DrawType: DrawTypeEnum.Lottery, IsPublished: false} or 
+                                              { DrawType: DrawTypeEnum.Lottery, IsFinished: true}))
                             {
                                 <DrawCard DrawId="draw.Id" ListType="@ListType"/>
                             }
