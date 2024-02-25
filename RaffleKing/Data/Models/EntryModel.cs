@@ -49,17 +49,6 @@ public class EntryModel
     public int? LuckyNumber { get; init; }
 
     /// <summary>
-    /// Whether or not this entry has won a prize, false by default. When set to true, PrizeId will also be
-    /// populated.
-    /// </summary>
-    public bool IsWinner { get; set; }
-    
-    /// <summary>
-    /// (Nullable) The identifier of the prize won by this entry, if any.
-    /// </summary>
-    public int? PrizeId { get; set; }
-
-    /// <summary>
     /// Navigation property to the associated ApplicationUser (if any).
     /// </summary>
     public virtual ApplicationUser? User { get; set; }
