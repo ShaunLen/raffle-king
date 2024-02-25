@@ -57,9 +57,4 @@ public class EntryModel
     /// Navigation property to the associated draw.
     /// </summary>
     public virtual DrawModel? Draw { get; set; }
-    
-    /// <summary>
-    /// Navigation property to the associated prize, if this entry is a winner.
-    /// </summary>
-    public virtual PrizeModel? Prize { get; set; }
 }
