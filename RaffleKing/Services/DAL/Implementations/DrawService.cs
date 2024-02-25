@@ -78,7 +78,7 @@ public class DrawService(IDbContextFactory<ApplicationDbContext> factory, IHttpC
         var draw = await context.Draws.FindAsync(drawId);
         if (draw != null)
         {
-            draw.IsFinished = false;
+            draw.IsFinished = true;
             await context.SaveChangesAsync();
         }
     }
