@@ -12,6 +12,11 @@ public class PrizeManagementService(IPrizeService prizeService)
         await prizeService.AddNewPrize(prizeModel);
     }
 
+    public async Task<PrizeModel?> GetPrizeById(int prizeId)
+    {
+        return await prizeService.GetPrizeById(prizeId);
+    }
+
     public async Task<List<PrizeModel>?> GetPrizesByDraw(int drawId)
     {
         return await prizeService.GetPrizesByDraw(drawId);
