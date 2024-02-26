@@ -1,0 +1,90 @@
+﻿@using RaffleKing.Data.Models
+@using RaffleKing.Services.BLL.Interfaces
+@using Microsoft.AspNetCore.Identity
+@using RaffleKing.Data
+@inject IPrizeManagementService PrizeManagementService
+@inject IEntryManagementService EntryManagementService
+@inject IDrawManagementService DrawManagementService
+@inject UserManager<ApplicationUser> UserManager
+@inject IUserService UserService
+
+<MudStack Justify="Justify.Center">
+    <MudText Typo="Typo.h6" Color="Color.Primary" Align="Align.Center">
+        PRIZE WINNERS
+    </MudText>
+    <MudGrid Justify="Justify.Center">
+        @if (_winners != null)
+        {
+            foreach (var winner in _winners)
+            {
+                <MudItem>
+                    <MudPaper Class="pa-4 border-t-2 mud-border-primary">
+                        <MudText Typo="Typo.h6" Color="Color.Tertiary">@_prizeTitles[winner.Id]</MudText>
+                        <MudText Typo="Typo.body1">@_prizeDescriptions[winner.Id]</MudText>
+                        <MudText Typo="Typo.button" Color="Color.Primary">Won by: @_winnerUsernames[winner.Id]</MudText>
+                    </MudPaper>
+                </MudItem>
+            }
+        }
+        @if (_winners == null || _winners.Count == 0)
+        {
+            <MudText Typo="Typo.h6" Align="Align.Center">
+                This @Draw?.DrawType.ToString().ToLower() did not have any winners!
+            </MudText>
+        }
+    </MudGrid>
+</MudStack>
+
+@code {
+    [Parameter] public DrawModel? Draw { get; set; }
+    private List<WinnerModel>? _winners { get; set; }
+    private Dictionary<int, string> _winnerUsernames = new();
+    private Dictionary<int, string> _prizeTitles = new();
+    private Dictionary<int, string> _prizeDescriptions = new();
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Draw == null)
+            return;
+
+        _winners = await DrawManagementService.GetWinnersByDraw(Draw.Id);
+        if (_winners == null)
+            return;
+
+        foreach (var winner in _winners)
+        {
+            _winnerUsernames[winner.Id] = await GetWinnerUsername(winner);
+            _prizeTitles[winner.Id] = await GetPrizeTitle(winner);
+            _prizeDescriptions[winner.Id] = await GetPrizeDescription(winner);
+        }
+    }
+
+    private async Task<string> GetWinnerUsername(WinnerModel winner)
+    {
+        if (winner.EntryId == null)
+            return "Anonymous";
+
+        var entry = await EntryManagementService.GetEntryById((int) winner.EntryId);
+        if (entry?.UserId == null)
+            return "Guest";
+
+        var user = await UserManager.FindByIdAsync(entry.UserId);
+        if (user == null)
+            return "Guest";
+
+        return user.UserName ?? "Guest";
+    }
+
+    private async Task<string> GetPrizeTitle(WinnerModel winner)
+    {
+        var prize = await PrizeManagementService.GetPrizeById(winner.PrizeId);
+        return prize == null ? "No Title" : prize.Title;
+    }
+
+    private async Task<string> GetPrizeDescription(WinnerModel winner)
+    {
+        var prize = await PrizeManagementService.GetPrizeById(winner.PrizeId);
+        return prize == null ? "No Description" : prize.Description;
+    }
+}

@@ -17,14 +17,19 @@
     </MudButton>
     @switch (_draw)
     {
-        case { IsPublished: false } when _prizes is { Count: > 0 }:
+        case { IsPublished: false } and { IsFinished: false } when _prizes is { Count: > 0 }:
             <MudAlert Severity="Severity.Info" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Center">
-                This @_draw.DrawType.ToString() is ready to be published!
+                This @_draw.DrawType.ToString().ToLower() is ready to be published!
             </MudAlert>
             break;
-        case {IsPublished: false} when _prizes is {Count: 0}:
+        case { IsPublished: false } when _prizes is {Count: 0}:
             <MudAlert Severity="Severity.Error" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Center">
-                This @_draw.DrawType.ToString() cannot be published until at least 1 prize is added!
+                This @_draw.DrawType.ToString().ToLower() cannot be published until at least 1 prize is added!
+            </MudAlert>
+            break;
+        case { IsFinished: true }:
+            <MudAlert Severity="Severity.Info" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Center">
+                This @_draw.DrawType.ToString().ToLower() is finished! See winner details below.
             </MudAlert>
             break;
     }
@@ -34,23 +39,34 @@
         <MudItem>
             <MudStack>
                 <DrawInformation Draw="_draw"/>
-                <MudContainer MaxWidth="MaxWidth.ExtraSmall">
-                    <MudText Typo="Typo.h6" Color="Color.Primary" Align="Align.Center">
-                        @(_userIsHost ? "DRAW ACTIONS" : "ENTER DRAW")
-                    </MudText>
-                    <MudPaper Class="pa-4 border-t-2 mud-border-primary">
-                        @if (_userIsHost)
-                        {
-                            <HostActions Draw="_draw" Prizes="_prizes" />
-                        }
-                        else
-                        {
-                            <EnterActions Draw="_draw"/>
-                        }
-                    </MudPaper>
-                </MudContainer>
+
+                @if (_draw is { IsFinished: false })
+                {
+                    <MudContainer MaxWidth="MaxWidth.ExtraSmall">
+                        <MudText Typo="Typo.h6" Color="Color.Primary" Align="Align.Center">
+                            @(_userIsHost ? "DRAW ACTIONS" : "ENTER DRAW")
+                        </MudText>
+                        <MudPaper Class="pa-4 border-t-2 mud-border-primary">
+                            @if (_userIsHost)
+                            {
+                                <HostActions Draw="_draw" Prizes="_prizes" />
+                            }
+                            else
+                            {
+                                <EnterActions Draw="_draw"/>
+                            }
+                        </MudPaper>
+                    </MudContainer>
+                }
             </MudStack>
         </MudItem>
     </MudGrid>
-    <PrizeList Draw="_draw" Prizes="_prizes"/>
+    @if (_draw is { IsFinished: false })
+    {
+        <PrizeList Draw="_draw" Prizes="_prizes"/>
+    }
+    else
+    {
+        <PrizeWinners Draw="_draw"/>
+    }
 </MudStack>
