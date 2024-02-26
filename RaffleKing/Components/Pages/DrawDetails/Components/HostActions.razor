@@ -4,12 +4,22 @@
 @using RaffleKing.Components.Shared
 @using RaffleKing.Services.BLL.Interfaces
 @inject IPrizeManagementService PrizeManagementService
+@inject IEntryManagementService EntryManagementService
 @inject IDrawManagementService DrawManagementService
 @inject IDrawExecutionService DrawExecutionService
 @inject NavigationManager NavigationManager
 @inject ISnackbarHelper SnackbarHelper
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+
+@if (Draw is { IsPublished: true })
+{
+    <MudText Typo="Typo.button" Color="Color.Info">
+        @_percentageEntriesRemaining% Total Entries Remaining
+    </MudText>
+    <MudProgressLinear Striped="true" Color="Color.Info" Size="Size.Large" Class="mt-0 mb-4"
+                       Value="@_percentageEntriesRemaining"/>
+}
 
 @if (Draw is { IsPublished: false })
 {
@@ -38,6 +48,16 @@
 @code {
     [Parameter] public DrawModel? Draw { get; set; }
     [Parameter] public List<PrizeModel>? Prizes { get; set; }
+
+    private double _percentageEntriesRemaining;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Draw == null)
+            return;
+
+        _percentageEntriesRemaining = await EntryManagementService.GetPercentageEntriesRemainingByDraw(Draw.Id);
+    }
 
     private async Task AddPrize()
     {
