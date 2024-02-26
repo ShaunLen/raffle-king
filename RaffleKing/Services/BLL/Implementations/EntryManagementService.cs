@@ -193,6 +193,11 @@ public class EntryManagementService(IUserService userService, IEntryService entr
         return OperationResult.Ok();
     }
 
+    public async Task<EntryModel?> GetEntryById(int entryId)
+    {
+        return await entryService.GetEntryById(entryId);
+    }
+
     public async Task<List<EntryModel>?> GetEntriesByDraw(int drawId)
     {
         return await entryService.GetEntriesByDraw(drawId);

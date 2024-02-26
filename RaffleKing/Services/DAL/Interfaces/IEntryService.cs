@@ -8,6 +8,7 @@ public interface IEntryService
     public Task AddEntry(EntryModel entryModel);
     
     /* Read Operations */
+    public Task<EntryModel?> GetEntryById(int entryId);
     public Task<List<EntryModel>?> GetAllEntries();
     public Task<List<EntryModel>?> GetEntriesByUser(string userId);
     public Task<List<EntryModel>?> GetEntriesByDraw(int drawId);

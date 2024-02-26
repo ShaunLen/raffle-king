@@ -16,6 +16,12 @@ public class EntryService(IDbContextFactory<ApplicationDbContext> factory, IHttp
         await context.SaveChangesAsync();
     }
 
+    public async Task<EntryModel?> GetEntryById(int entryId)
+    {
+        await using var context = await factory.CreateDbContextAsync();
+        return await context.Entries.FirstOrDefaultAsync(entry => entry.Id == entryId);
+    }
+
     /* Read Operations */
     public async Task<List<EntryModel>?> GetAllEntries()
     {

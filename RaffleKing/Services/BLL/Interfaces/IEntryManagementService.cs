@@ -8,6 +8,7 @@ public interface IEntryManagementService
     Task<OperationResult> TryEnterRaffle(int drawId, int numberOfEntries, string guestEmail = "");
     Task<OperationResult> TryEnterLottery(int drawId, IEnumerable<int> luckyNumbers);
     Task<OperationResult> CurrentUserCanEnterDraw(int drawId);
+    Task<EntryModel?> GetEntryById(int entryId);
     Task<List<EntryModel>?> GetEntriesByDraw(int drawId);
     Task<List<EntryModel>?> GetCurrentUserEntries();
     Task<List<EntryModel>?> GetCurrentUserEntriesByDraw(int drawId);
