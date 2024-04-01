@@ -6,7 +6,8 @@ using RaffleKing.Services.DAL.Interfaces;
 namespace RaffleKing.Services.BLL.Implementations;
 
 public class DrawManagementService(IDrawService drawService, IPrizeService prizeService, IEntryService entryService, 
-    IUserService userService, IWinnerService winnerService) : IDrawManagementService
+    IUserService userService, IWinnerService winnerService, IDrawExecutionService drawExecutionService) 
+    : IDrawManagementService
 {
     public async Task<OperationResult<int>> AddNewDraw(DrawModel draw)
     {
@@ -56,7 +57,12 @@ public class DrawManagementService(IDrawService drawService, IPrizeService prize
         if(prizeCount == 0)
             return OperationResult.Fail("Cannot publish a draw that has no prizes.");
 
+        var draw = await drawService.GetDrawById(drawId);
+        if (draw == null)
+            return OperationResult.Fail("Invalid draw.");;
+
         await drawService.ActivateDraw(drawId);
+        drawExecutionService.ScheduleDrawExecution(drawId, draw.DrawDate);
         return OperationResult.Ok();
     }
 
