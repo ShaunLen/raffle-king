@@ -47,9 +47,34 @@ public class EmailService(string smtpServer, int smtpPort, string fromAddress,
     {
         throw new NotImplementedException();
     }
-
-    public void SendWinnerEmail(string recipient, int prizeId)
+    
+    public void SendGuestWinnerEmail(string recipient)
     {
-        throw new NotImplementedException();
+        Task.Run(async () =>
+        {
+            var templatePath = Path.Combine(emailTemplatePath, "GuestWinnerEmail.html");
+            var emailBody = await File.ReadAllTextAsync(templatePath);
+
+            await SendEmail(
+                recipient,
+                "You're a winner!",
+                emailBody
+            );
+        });
+    }
+
+    public void SendUserWinnerEmail(string recipient)
+    {
+        Task.Run(async () =>
+        {
+            var templatePath = Path.Combine(emailTemplatePath, "UserWinnerEmail.html");
+            var emailBody = await File.ReadAllTextAsync(templatePath);
+
+            await SendEmail(
+                recipient,
+                "You're a winner!",
+                emailBody
+            );
+        });
     }
 }
