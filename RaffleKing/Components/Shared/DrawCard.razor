@@ -1,5 +1,6 @@
 ﻿@using RaffleKing.Services.BLL.Interfaces
 @inject IDrawManagementService DrawManagementService
+@inject IEntryManagementService EntryManagementService
 @inject NavigationManager NavigationManager
 
 <MudPaper Class="pa-4 border-t-2 mud-border-primary" Width="400px">
@@ -24,9 +25,8 @@
     @if (!_expired)
     {
         // Display percentage of entries remaining
-        // TODO: Switch placeholder percentage for calculated percentage
-        <MudText Typo="Typo.button" Color="Color.Info">50% Remaining</MudText>
-        <MudProgressLinear Striped="true" Color="Color.Info" Size="Size.Large" Value="50" Class="mt-0"/>
+        <MudText Typo="Typo.button" Color="Color.Info">@_percentageEntriesRemaining% Remaining</MudText>
+        <MudProgressLinear Striped="true" Color="Color.Info" Size="Size.Large" Value="@_percentageEntriesRemaining" Class="mt-0"/>
     }
     
     @* View/Edit Draw Button 

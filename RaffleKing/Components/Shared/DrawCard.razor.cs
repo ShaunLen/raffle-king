@@ -23,6 +23,7 @@ public partial class DrawCard
     private string? _dateString;
     private bool _expired;
     private Color _dateColor;
+    private double _percentageEntriesRemaining;
 
     protected override async Task OnInitializedAsync()
     {
@@ -33,6 +34,7 @@ public partial class DrawCard
         _dateString = GetFormattedDate(_draw.DrawDate);
         _expired = _draw.DrawDate < DateTime.Now;
         _dateColor = _expired ? Color.Error : Color.Info;
+        _percentageEntriesRemaining = await EntryManagementService.GetPercentageEntriesRemainingByDraw(DrawId);
         
         // Restrict description displayed to 100 characters.
         _description = _draw.Description.Length > 100 ? $"{_draw.Description[..100]}..." : _draw.Description;
