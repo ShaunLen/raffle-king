@@ -1,15 +1,20 @@
-﻿using RaffleKing.Data.Models;
+﻿using Hangfire;
+using RaffleKing.Common;
+using RaffleKing.Data.Models;
 using RaffleKing.Services.BLL.Interfaces;
 using RaffleKing.Services.DAL.Interfaces;
 
 namespace RaffleKing.Services.BLL.Implementations;
 
 public class DrawExecutionService(IDrawService drawService, IEntryService entryService, IPrizeService prizeService, 
-    IWinnerService winnerService) : IDrawExecutionService
+    IWinnerService winnerService, IBackgroundJobClient backgroundJobs) : IDrawExecutionService
 {
-    public async Task ScheduleDrawExecution(int drawId)
+    public OperationResult ScheduleDrawExecution(int drawId, DateTime scheduleTime)
     {
-        throw new NotImplementedException();
+        if (scheduleTime <= DateTime.Now) return OperationResult.Fail("Scheduled time is not in the future!");
+        
+        backgroundJobs.Schedule(() => ExecuteDraw(drawId), scheduleTime - DateTime.Now);
+        return OperationResult.Ok();
     }
 
     public async Task ExecuteDraw(int drawId)

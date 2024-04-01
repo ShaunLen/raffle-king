@@ -1,10 +1,11 @@
-﻿using RaffleKing.Data.Models;
+﻿using RaffleKing.Common;
+using RaffleKing.Data.Models;
 
 namespace RaffleKing.Services.BLL.Interfaces;
 
 public interface IDrawExecutionService
 {
-    Task ScheduleDrawExecution(int drawId);
+    OperationResult ScheduleDrawExecution(int drawId, DateTime scheduleTime);
     Task ExecuteDraw(int drawId);
     void SelectWinnersForRaffle(List<PrizeModel> prizes, List<EntryModel> entries);
     void SelectWinnerForRaffleBundle(List<PrizeModel> prizes, List<EntryModel> entries);
