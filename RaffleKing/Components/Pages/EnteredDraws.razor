@@ -1,0 +1,31 @@
+﻿@page "/draws/entered-draws"
+@using RaffleKing.Components.Shared
+@using RaffleKing.Services.BLL.Interfaces
+@inject IEntryManagementService EntryManagementService
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<PageTitle>Entered Draws</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        <DrawList ListType="DrawListType.EnteredDraws"/>
+    </Authorized>
+    <NotAuthorized>
+        <MudStack AlignItems="AlignItems.Center">
+            <MudText Typo="Typo.h1">Enter <span style="color: #0bba83">Guest Reference</span></MudText>
+            <MudPaper Class="pa-4 border-t-2 mud-border-primary" Width="500px">
+                <MudText Typo="Typo.body1" Align="Align.Center">
+                    Enter the guest reference code you received via email after entering a draw.
+                </MudText>
+                <MudTextField T="string" @bind-Value="_guestRef" Label="Guest Reference Code"
+                              Immediate="true" AutoFocus="true"/>
+                <MudButton OnClick="@(async _ => await LoadDrawFromGuestRef())" Class="mt-8" FullWidth="true" Variant="Variant.Filled"
+                           Color="Color.Primary">FIND ENTRY</MudButton>
+            </MudPaper>
+            <MudText Typo="Typo.h6">Or log in if you have an account...</MudText>
+            <MudButton Href="/Account/Login" FullWidth="false" Variant="Variant.Filled"
+                       Color="Color.Primary">LOG IN</MudButton>
+        </MudStack>
+    </NotAuthorized>
+</AuthorizeView>
