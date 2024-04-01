@@ -1,4 +1,5 @@
 using Blazored.LocalStorage;
+using Hangfire;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -92,7 +93,14 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
+// Add Hangfire configuration
+builder.Services.AddHangfire(configuration => configuration.UseSqlServerStorage(connectionString));
+builder.Services.AddHangfireServer();
+
 var app = builder.Build();
+
+// TODO: Temporarily use Hangfire dashboard for dev purposes
+app.UseHangfireDashboard();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
