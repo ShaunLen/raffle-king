@@ -23,6 +23,11 @@ public class WinnerModel
     /// </summary>
     [ForeignKey(nameof(Prize))]
     public int PrizeId { get; init; }
+
+    /// <summary>
+    /// Whether the prize has been claimed by the winner.
+    /// </summary>
+    public bool IsClaimed { get; set; }
     
     /// <summary>
     /// Navigation property to the associated entry.
