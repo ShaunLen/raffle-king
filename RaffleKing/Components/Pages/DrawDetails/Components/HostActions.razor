@@ -35,12 +35,6 @@
                OnClick="@PublishDrawWithConfirmation">Publish Draw</MudButton>
 }
 
-@if (Draw is { IsPublished: true })
-{
-    <MudButton Variant="Variant.Filled" Color="Color.Info" FullWidth="true" Class="mb-4"
-               OnClick="@ExecuteDraw">Execute Draw</MudButton>
-}
-
 <MudButton Variant="Variant.Filled" Color="Color.Error" FullWidth="true" OnClick="@DeleteDrawWithConfirmation">
     Delete Draw
 </MudButton>
