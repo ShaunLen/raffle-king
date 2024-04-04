@@ -1,5 +1,101 @@
 ﻿@page "/"
 @using RaffleKing.Services.Utilities.Interfaces
+@using RaffleKing.Services.BLL.Interfaces
+@using RaffleKing.Components.Shared
+@using Microsoft.IdentityModel.Tokens
+@using Microsoft.AspNetCore.Identity
+@using RaffleKing.Data
 @inject ISnackbarHelper SnackbarHelper
+@inject IDrawManagementService DrawManagementService
+@inject IEntryManagementService EntryManagementService
+@inject IPrizeManagementService PrizeManagementService
+@inject UserManager<ApplicationUser> UserManager
+@inject IUserService UserService
 
 <PageTitle>Home</PageTitle>
+
+<MudStack AlignItems="AlignItems.Center">
+    <MudText Typo="Typo.h1"><span style="color: #0bba83">Your</span> Dashboard</MudText>
+    <MudGrid Justify="Justify.Center">
+        <MudItem>
+            <MudStack AlignItems="AlignItems.Center">
+                <MudText Typo="Typo.h4"><span style="color: #0bba83">Upcoming</span> Draws</MudText>
+                @if (!_activeDraws.IsNullOrEmpty())
+                {
+                    @foreach (var draw in _activeDraws!)
+                    {
+                        <DrawCard DrawId="draw.Id" ListType="DrawListType.ActiveDraws"/>
+                    }
+                }
+                else
+                {
+                    <MudPaper Class="pa-4 border-t-2 mud-border-primary" Width="400px">
+                        <MudStack AlignItems="AlignItems.Center">
+                            <MudText Typo="Typo.body1">No draws currently active, check again later!</MudText>
+                        </MudStack>
+                    </MudPaper>
+                }
+            </MudStack>
+        </MudItem>
+        <MudItem>
+            <MudStack AlignItems="AlignItems.Center">
+                <MudText Typo="Typo.h4"><span style="color: #0bba83">Entered</span> Draws</MudText>
+                @if (!_enteredDraws.IsNullOrEmpty())
+                {
+                    @foreach (var draw in _enteredDraws!)
+                    {
+                        <DrawCard DrawId="draw.Id" ListType="DrawListType.EnteredDraws"/>
+                    }
+                }
+                else
+                {
+                    if (_userAuthenticated)
+                    {
+                        <MudPaper Class="pa-4 border-t-2 mud-border-primary" Width="400px">
+                            <MudStack AlignItems="AlignItems.Center">
+                                <MudText Typo="Typo.body1">You haven't entered any draws yet!</MudText>
+                            </MudStack>
+                        </MudPaper>
+                    }
+                    else
+                    {
+                        <MudPaper Class="pa-4 border-t-2 mud-border-primary" Width="400px">
+                            <MudStack AlignItems="AlignItems.Center">
+                                <MudText Typo="Typo.body1">
+                                    <a href="Account/Login" style="color: #0bba83">Log in</a> or
+                                    <a href="Account/Register" style="color: #0bba83">register</a>
+                                    to see the list of draws you've entered!
+                                </MudText>
+                            </MudStack>
+                        </MudPaper>
+                    }
+                }
+            </MudStack>
+        </MudItem>
+        <MudItem>
+            <MudStack AlignItems="AlignItems.Center">
+                <MudText Typo="Typo.h4"><span style="color: #0bba83">Recent</span> Winners</MudText>
+                @if (!_recentWinners.IsNullOrEmpty())
+                {
+                    @for (var i = 0; i < _recentWinners!.Count-1; i++)
+                    {
+                        var index = i; // workaround for how Blazor captures the outer index internally
+                        <MudPaper Class="pa-4 border-t-2 mud-border-primary" Width="300px">
+                            <MudStack AlignItems="AlignItems.Center">
+                                <MudText Typo="Typo.body1">@_recentWinnerNames[index] won @_recentWinnerPrizes[index]!</MudText>
+                            </MudStack>
+                        </MudPaper>
+                    }
+                }
+                else
+                {
+                    <MudPaper Class="pa-4 border-t-2 mud-border-primary" Width="300px">
+                        <MudStack AlignItems="AlignItems.Center">
+                            <MudText Typo="Typo.body1">There are no recent winners!</MudText>
+                        </MudStack>
+                    </MudPaper>
+                }
+            </MudStack>
+        </MudItem>
+    </MudGrid>
+</MudStack>
