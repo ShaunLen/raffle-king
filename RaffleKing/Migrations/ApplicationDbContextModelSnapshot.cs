@@ -349,6 +349,9 @@ namespace RaffleKing.Migrations
                     b.Property<int?>("EntryId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsClaimed")
+                        .HasColumnType("bit");
+
                     b.Property<int>("PrizeId")
                         .HasColumnType("int");
 
