@@ -8,7 +8,7 @@ using RaffleKing.Services.DAL.Interfaces;
 namespace RaffleKing.Services.BLL.Implementations;
 
 public class EntryManagementService(IUserService userService, IEntryService entryService, IDrawService drawService,
-    IEmailService emailService) : IEntryManagementService
+    IEmailService emailService, IWinnerService winnerService) : IEntryManagementService
 {
     public async Task<OperationResult> TryEnterRaffle(int drawId, int numberOfEntries, string guestEmail = "")
     {
@@ -324,5 +324,10 @@ public class EntryManagementService(IUserService userService, IEntryService entr
     {
         var entries = await GetEntriesByDraw(drawId);
         return entries != null && entries.Any(entry => entry.GuestEmail == guestEmail);
+    }
+
+    public async Task<List<WinnerModel>?> GetRecentWinners(int numberOfWinners)
+    {
+        return await winnerService.GetRecentWinners(numberOfWinners);
     }
 }
