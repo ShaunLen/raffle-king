@@ -1,0 +1,22 @@
+﻿@using RaffleKing.Services.BLL.Interfaces
+@using RaffleKing.Services.Utilities.Interfaces
+@inject IPrizeManagementService PrizeManagementService
+@inject NavigationManager NavigationManager
+@inject ISnackbarHelper SnackbarHelper
+
+<MudPaper Class="pa-4 border-t-2 mud-border-primary" Width="300px">
+    <MudStack AlignItems="AlignItems.Center">
+        <MudText Typo="Typo.body1">@_text</MudText>
+        <MudGrid Justify="Justify.Center">
+            <MudItem>
+                <MudButton Color="Color.Primary" OnClick="@ClaimPrize" Class="my-0">
+                    Claim Prize
+                </MudButton>
+            </MudItem>
+            <MudItem>
+                <MudButton OnClick="@(() => NavigationManager.NavigateTo($"/draws/draw-details/{_drawId}"))"
+                           Color="Color.Primary" Class="my-0">View Draw</MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudStack>
+</MudPaper>
