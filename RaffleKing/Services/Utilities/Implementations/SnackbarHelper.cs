@@ -12,7 +12,8 @@ public class SnackbarHelper(ISnackbar snackbar, ILocalStorageService localStorag
     "Snackbar_PrizeAdded",
     "Snackbar_PrizeDeleted",
     "Snackbar_EnteredDraw",
-    "Snackbar_RemovedEntries"];
+    "Snackbar_RemovedEntries",
+    "Snackbar_PrizeClaimed"];
     
     public async Task QueueSnackbarMessageForReload(string key, string message)
     {
