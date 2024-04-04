@@ -34,6 +34,10 @@ public partial class EnteredDraws
                 var hasWon = false;
                 foreach (var winner in winners.Where(winner => winner.EntryId == entry.Id))
                 {
+                    // Don't reclaim any already claimed prizes
+                    if(winner.IsClaimed)
+                        continue;
+                    
                     await PrizeManagementService.ClaimPrize(winner.Id);
                     hasWon = true;
                 }
