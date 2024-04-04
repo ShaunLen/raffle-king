@@ -41,10 +41,10 @@ public partial class DrawCard
 
         _buttonText = ListType switch
         {
-            DrawListType.ActiveDraws => "View Draw",
-            DrawListType.HostedDraws => _expired ? "View Draw" : "Edit Draw",
-            DrawListType.EnteredDraws => "View Draw",
-            _ => "View Draw"
+            DrawListType.ActiveDraws => $"View {_draw.DrawType}",
+            DrawListType.HostedDraws => _expired ? $"View {_draw.DrawType}" : $"Edit {_draw.DrawType}",
+            DrawListType.EnteredDraws => $"View {_draw.DrawType}",
+            _ => $"View {_draw.DrawType}"
         };
     }
 
