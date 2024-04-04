@@ -59,4 +59,23 @@ public class WinnerService(IDbContextFactory<ApplicationDbContext> factory, IHtt
             .Take(numberOfWinners)
             .ToListAsync();
     }
+
+    public async Task<List<WinnerModel>?> GetUnclaimedPrizesByUser(string userId)
+    {
+        await using var context = await factory.CreateDbContextAsync();
+        return await context.Winners
+            .Where(winner => winner.Entry != null && winner.Entry.UserId == userId && !winner.IsClaimed)
+            .ToListAsync();
+    }
+
+    public async Task SetClaimed(int winnerId)
+    {
+        await using var context = await factory.CreateDbContextAsync();
+        var winner = await context.Winners.FindAsync(winnerId);
+        if (winner != null)
+        {
+            winner.IsClaimed = true;
+            await context.SaveChangesAsync();
+        }
+    }
 }
