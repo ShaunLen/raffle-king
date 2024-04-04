@@ -50,4 +50,13 @@ public class WinnerService(IDbContextFactory<ApplicationDbContext> factory, IHtt
             .Where(winner => winner.Entry != null && winner.Entry.DrawId == drawId)
             .ToListAsync();
     }
+
+    public async Task<List<WinnerModel>?> GetRecentWinners(int numberOfWinners)
+    {
+        await using var context = await factory.CreateDbContextAsync();
+        return await context.Winners
+            .OrderByDescending(winner => winner.Id)
+            .Take(numberOfWinners)
+            .ToListAsync();
+    }
 }

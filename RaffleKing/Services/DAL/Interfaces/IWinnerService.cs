@@ -9,4 +9,5 @@ public interface IWinnerService
     
     /* Read Operations */
     public Task<List<WinnerModel>?> GetWinnersByDraw(int drawId);
+    public Task<List<WinnerModel>?> GetRecentWinners(int numberOfWinners);
 }
