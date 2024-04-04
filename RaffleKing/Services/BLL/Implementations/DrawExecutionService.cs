@@ -40,15 +40,19 @@ public class DrawExecutionService(IDrawService drawService, IEntryService entryS
                     SelectWinnerForRaffleBundle(prizes, entries);
                 else
                     SelectWinnersForRaffle(prizes, entries);
-                return;
+                break;
             case DrawTypeEnum.Lottery:
                 if(draw.IsBundle)
                     DrawLuckyNumberForLotteryBundle(draw, prizes, entries);
                 else
                     DrawLuckyNumbersForLottery(draw, prizes, entries);
-                return;
-            default:
-                return;
+                break;
+        }
+
+        foreach (var entry in entries)
+        {
+            entry.GuestEmail = string.Empty;
+            await entryService.UpdateEntry(entry);
         }
     }
 
