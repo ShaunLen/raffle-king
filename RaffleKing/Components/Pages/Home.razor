@@ -17,6 +17,7 @@
 <MudStack AlignItems="AlignItems.Center">
     <MudText Typo="Typo.h1"><span style="color: #0bba83">Your</span> Dashboard</MudText>
     <MudGrid Justify="Justify.Center">
+        @* Upcoming Draws *@
         <MudItem>
             <MudStack AlignItems="AlignItems.Center">
                 <MudText Typo="Typo.h4"><span style="color: #0bba83">Upcoming</span> Draws</MudText>
@@ -31,12 +32,15 @@
                 {
                     <MudPaper Class="pa-4 border-t-2 mud-border-primary" Width="400px">
                         <MudStack AlignItems="AlignItems.Center">
-                            <MudText Typo="Typo.body1">No draws currently active, check again later!</MudText>
+                            <MudText Typo="Typo.body1">
+                                There are no further upcoming draws, check back soon for more!
+                            </MudText>
                         </MudStack>
                     </MudPaper>
                 }
             </MudStack>
         </MudItem>
+        @* Entered Draws *@
         <MudItem>
             <MudStack AlignItems="AlignItems.Center">
                 <MudText Typo="Typo.h4"><span style="color: #0bba83">Entered</span> Draws</MudText>
@@ -53,7 +57,10 @@
                     {
                         <MudPaper Class="pa-4 border-t-2 mud-border-primary" Width="400px">
                             <MudStack AlignItems="AlignItems.Center">
-                                <MudText Typo="Typo.body1">You haven't entered any draws yet!</MudText>
+                                <MudText Typo="Typo.body1">
+                                    You haven't entered any upcoming draws! View the full list of upcoming draws
+                                    <a href="draws/active-draws" style="color: #0bba83">here</a>.
+                                </MudText>
                             </MudStack>
                         </MudPaper>
                     }
@@ -72,30 +79,66 @@
                 }
             </MudStack>
         </MudItem>
-        <MudItem>
-            <MudStack AlignItems="AlignItems.Center">
-                <MudText Typo="Typo.h4"><span style="color: #0bba83">Recent</span> Winners</MudText>
-                @if (!_recentWinners.IsNullOrEmpty())
-                {
-                    @for (var i = 0; i < _recentWinners!.Count-1; i++)
+        @if (_userAuthenticated)
+        {
+            @* Unclaimed Prizes *@
+            <MudItem>
+                <MudStack AlignItems="AlignItems.Center">
+                    <MudText Typo="Typo.h4"><span style="color: #0bba83">Unclaimed</span> Prizes</MudText>
+                    @if (!_unclaimedPrizes.IsNullOrEmpty())
                     {
-                        var index = i; // workaround for how Blazor captures the outer index internally
+                        @for (var i = 0; i < _unclaimedPrizes!.Count; i++)
+                        {
+                            var index = i; // workaround for how Blazor captures the outer index internally
+                            <UnclaimedPrizeCard Winner="_unclaimedPrizes[index]"/>
+                        }
+                    }
+                    else
+                    {
                         <MudPaper Class="pa-4 border-t-2 mud-border-primary" Width="300px">
                             <MudStack AlignItems="AlignItems.Center">
-                                <MudText Typo="Typo.body1">@_recentWinnerNames[index] won @_recentWinnerPrizes[index]!</MudText>
+                                <MudText Typo="Typo.body1">You have no unclaimed prizes!</MudText>
                             </MudStack>
                         </MudPaper>
                     }
-                }
-                else
-                {
-                    <MudPaper Class="pa-4 border-t-2 mud-border-primary" Width="300px">
-                        <MudStack AlignItems="AlignItems.Center">
-                            <MudText Typo="Typo.body1">There are no recent winners!</MudText>
-                        </MudStack>
-                    </MudPaper>
-                }
-            </MudStack>
-        </MudItem>
+                </MudStack>
+            </MudItem>
+        }
+        else
+        {
+            @* Recent Winners *@
+            <MudItem>
+                <MudStack AlignItems="AlignItems.Center">
+                    <MudText Typo="Typo.h4"><span style="color: #0bba83">Recent</span> Winners</MudText>
+                    @if (!_recentWinners.IsNullOrEmpty())
+                    {
+                        string borderClass;
+                        @for (var i = 0; i < _recentWinners!.Count - 1; i++)
+                        {
+                            var index = i; // workaround for how Blazor captures the outer index internally
+                            borderClass = _currentUsername == _recentWinnerNames[index]
+                                ? "pa-4 border-t-2 mud-border-secondary"
+                                : "pa-4 border-t-2 mud-border-primary";
+
+                            <MudPaper Class=@borderClass Width="300px">
+                                <MudStack AlignItems="AlignItems.Center">
+                                    <MudText Typo="Typo.body1">
+                                        @_recentWinnerNames[index] won @_recentWinnerPrizes[index]!
+                                    </MudText>
+                                </MudStack>
+                            </MudPaper>
+                        }
+                    }
+                    else
+                    {
+                        <MudPaper Class="pa-4 border-t-2 mud-border-primary" Width="300px">
+                            <MudStack AlignItems="AlignItems.Center">
+                                <MudText Typo="Typo.body1">There are no recent winners!</MudText>
+                            </MudStack>
+                        </MudPaper>
+                    }
+                </MudStack>
+            </MudItem>
+        }
     </MudGrid>
 </MudStack>
