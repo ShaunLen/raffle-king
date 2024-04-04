@@ -1,8 +1,12 @@
 ﻿@page "/draws/entered-draws"
 @using RaffleKing.Components.Shared
 @using RaffleKing.Services.BLL.Interfaces
+@using RaffleKing.Services.Utilities.Interfaces
 @inject IEntryManagementService EntryManagementService
+@inject IPrizeManagementService PrizeManagementService
+@inject IDrawManagementService DrawManagementService
 @inject NavigationManager NavigationManager
+@inject ISnackbarHelper SnackbarHelper
 @inject ISnackbar Snackbar
 
 <PageTitle>Entered Draws</PageTitle>

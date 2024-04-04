@@ -16,6 +16,34 @@ public partial class EnteredDraws
         }
         
         var drawId = entry.DrawId;
+        var draw = await DrawManagementService.GetDrawById(drawId);
+        
+        if (draw == null)
+        {
+            Snackbar.Add("Invalid draw!", Severity.Error);
+            return;
+        }
+
+        // Claim any prizes this guest entry has won
+        if (draw.IsFinished)
+        {
+            var winners = await DrawManagementService.GetWinnersByDraw(drawId);
+
+            if (winners != null)
+            {
+                var hasWon = false;
+                foreach (var winner in winners.Where(winner => winner.EntryId == entry.Id))
+                {
+                    await PrizeManagementService.ClaimPrize(winner.Id);
+                    hasWon = true;
+                }
+                
+                if(hasWon)
+                    await SnackbarHelper.QueueSnackbarMessageForReload(
+                        "PrizeClaimed", "You're a winner! Prize(s) claimed.");
+            }
+        }
+        
         NavigationManager.NavigateTo($"/draws/draw-details/{drawId}");
     }
 }
