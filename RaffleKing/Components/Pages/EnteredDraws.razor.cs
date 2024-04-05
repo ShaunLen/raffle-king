@@ -39,6 +39,7 @@ public partial class EnteredDraws
                         continue;
                     
                     await PrizeManagementService.ClaimPrize(winner.Id);
+                    await EntryManagementService.DeleteEntry(entry.Id);
                     hasWon = true;
                 }
                 
