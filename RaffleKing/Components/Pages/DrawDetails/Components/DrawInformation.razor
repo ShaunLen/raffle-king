@@ -17,7 +17,7 @@
                 <MudStack AlignItems="AlignItems.Center" Spacing="0">
                     <MudIcon Icon="@Icons.Material.Filled.CalendarMonth" Size="Size.Large" Class="mb-2"/>
                     <MudText Typo="Typo.button" Align="Align.Center" Style="line-height: 1.2">
-                        Draw date:<br/>@Draw?.DrawDate.ToShortDateString()
+                        Draw date:<br/>@Draw?.DrawDate.ToShortDateString()<br/>@Draw?.DrawDate.ToString("HH:mm")
                     </MudText>
                 </MudStack>
             </MudItem>
