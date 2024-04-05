@@ -21,4 +21,4 @@ fi
 echo "Building and running Docker containers..."
 docker-compose up --build -d
 
-echo "Setup complete. RaffleKing should now be running."
+echo "Setup complete. RaffleKing running at http://localhost:8001/"
