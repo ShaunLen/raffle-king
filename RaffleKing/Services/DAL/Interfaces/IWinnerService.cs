@@ -12,4 +12,5 @@ public interface IWinnerService
     public Task<List<WinnerModel>?> GetRecentWinners(int numberOfWinners);
     public Task<List<WinnerModel>?> GetUnclaimedPrizesByUser(string userId);
     public Task SetClaimed(int winnerId);
+    public Task DeleteWinnerByEntry(int entryId);
 }

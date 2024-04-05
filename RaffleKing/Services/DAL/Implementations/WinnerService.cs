@@ -78,4 +78,18 @@ public class WinnerService(IDbContextFactory<ApplicationDbContext> factory, IHtt
             await context.SaveChangesAsync();
         }
     }
+
+    public async Task DeleteWinnerByEntry(int entryId)
+    {
+        await using var context = await factory.CreateDbContextAsync();
+        var winners = await context.Winners
+            .Where(winner => winner.Entry != null && winner.Entry.Id == entryId)
+            .ToListAsync();
+
+        if (winners.Count > 0)
+        {
+            context.Winners.RemoveRange(winners);
+            await context.SaveChangesAsync();
+        }
+    }
 }
