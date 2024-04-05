@@ -58,15 +58,7 @@ public class EntryService(IDbContextFactory<ApplicationDbContext> factory, IHttp
         await using var context = await factory.CreateDbContextAsync();
         return await context.Entries.FirstOrDefaultAsync(entry => entry.GuestReferenceCode == guestRef);
     }
-
-    /* Update Operations */
-    public async Task UpdateEntry(EntryModel entryModel)
-    {
-        await using var context = await factory.CreateDbContextAsync();
-        context.Entries.Update(entryModel);
-        await context.SaveChangesAsync();
-    }
-
+    
     public async Task<int> CountEntriesByDraw(int drawId)
     {
         await using var context = await factory.CreateDbContextAsync();
@@ -79,6 +71,14 @@ public class EntryService(IDbContextFactory<ApplicationDbContext> factory, IHttp
         await using var context = await factory.CreateDbContextAsync();
         return await context.Entries
             .CountAsync(entry => entry.UserId == userId && entry.DrawId == drawId);
+    }
+
+    /* Update Operations */
+    public async Task UpdateEntry(EntryModel entryModel)
+    {
+        await using var context = await factory.CreateDbContextAsync();
+        context.Entries.Update(entryModel);
+        await context.SaveChangesAsync();
     }
 
     /* Delete Operations */

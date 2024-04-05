@@ -14,11 +14,11 @@ public interface IEntryService
     public Task<List<EntryModel>?> GetEntriesByDraw(int drawId);
     public Task<List<EntryModel>?> GetEntriesByUserAndDraw(string userId, int drawId);
     public Task<EntryModel?> GetEntryByGuestRef(string guestRef);
+    public Task<int> CountEntriesByDraw(int drawId);
+    public Task<int> CountEntriesByUserAndDraw(string userId, int drawId);
     
     /* Update Operations */
     public Task UpdateEntry(EntryModel entryModel);
-    public Task<int> CountEntriesByDraw(int drawId);
-    public Task<int> CountEntriesByUserAndDraw(string userId, int drawId);
 
     /* Delete Operations */
     public Task DeleteEntry(int entryId);
