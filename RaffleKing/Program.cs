@@ -100,7 +100,10 @@ builder.Services.AddHangfireServer();
 var app = builder.Build();
 
 // TODO: Temporarily use Hangfire dashboard for dev purposes
-app.UseHangfireDashboard();
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new [] { new AllowAllAuthorizationFilter() }
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
