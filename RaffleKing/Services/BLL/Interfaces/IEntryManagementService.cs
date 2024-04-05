@@ -25,4 +25,5 @@ public interface IEntryManagementService
     Task<bool> IsCurrentUserParticipatingInDraw(int drawId);
     Task<bool> IsGuestParticipatingInDraw(int drawId, string guestEmail);
     Task<List<WinnerModel>?> GetRecentWinners(int numberOfWinners);
+    Task DeleteEntry(int entryId);
 }

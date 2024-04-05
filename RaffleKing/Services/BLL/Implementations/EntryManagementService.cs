@@ -330,4 +330,22 @@ public class EntryManagementService(IUserService userService, IEntryService entr
     {
         return await winnerService.GetRecentWinners(numberOfWinners);
     }
+
+    public async Task DeleteEntry(int entryId)
+    {
+        var entry = await entryService.GetEntryById(entryId);
+
+        if (entry is { IsGuest: true })
+        {
+            Console.WriteLine("\n\n\n\n\n");
+            Console.WriteLine("DELETING WINNER");
+            Console.WriteLine("\n\n\n\n\n");
+            await winnerService.DeleteWinnerByEntry(entryId);
+        }
+        
+        Console.WriteLine("\n\n\n\n\n");
+        Console.WriteLine("DELETING ENTRY");
+        Console.WriteLine("\n\n\n\n\n");
+        await entryService.DeleteEntry(entryId);
+    }
 }
