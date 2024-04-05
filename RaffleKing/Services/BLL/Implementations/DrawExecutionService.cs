@@ -49,10 +49,14 @@ public class DrawExecutionService(IDrawService drawService, IEntryService entryS
                 break;
         }
 
-        foreach (var entry in entries)
+        var winners = await winnerService.GetWinnersByDraw(drawId);
+        if (winners == null)
+            return;
+        
+        // Delete any guest entries which are not a winning entry
+        foreach (var entry in entries.Where(entry => winners.All(winner => winner.EntryId != entry.Id && entry.IsGuest)))
         {
-            entry.GuestEmail = string.Empty;
-            await entryService.UpdateEntry(entry);
+            await entryService.DeleteEntry(entry.Id);
         }
     }
 
