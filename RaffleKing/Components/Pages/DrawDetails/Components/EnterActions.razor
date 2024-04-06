@@ -102,7 +102,7 @@
 
     private async Task EnterDraw()
     {
-        OperationResult result;
+        OperationResult<string> result;
         switch (Draw?.DrawType)
         {
             case DrawTypeEnum.Raffle:
@@ -122,7 +122,8 @@
         }
 
         if(_userIsGuest)
-            await SnackbarHelper.QueueSnackbarMessageForReload("EnteredDraw", "Draw entered as guest!");
+            await SnackbarHelper.QueueSnackbarMessageForReload("EnteredDraw", $"Draw entered as guest! " +
+                                                                              $"Reference code: {result.Data}");
         else
             await SnackbarHelper.QueueSnackbarMessageForReload("EnteredDraw", "Draw entered!");
         NavigationManager.NavigateTo(NavigationManager.Uri, true);

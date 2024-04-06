@@ -10,37 +10,37 @@ namespace RaffleKing.Services.BLL.Implementations;
 public class EntryManagementService(IUserService userService, IEntryService entryService, IDrawService drawService,
     IEmailService emailService, IWinnerService winnerService) : IEntryManagementService
 {
-    public async Task<OperationResult> TryEnterRaffle(int drawId, int numberOfEntries, string guestEmail = "")
+    public async Task<OperationResult<string>> TryEnterRaffle(int drawId, int numberOfEntries, string guestEmail = "")
     {
         var canEnter = await CurrentUserCanEnterDraw(drawId);
         var isGuest = await userService.IsGuest();
 
         if (!canEnter.Success)
-            return canEnter;
+            return OperationResult<string>.Fail(canEnter.Message, "");
 
         if (isGuest)
         {
             if(numberOfEntries > 1)
-                return OperationResult.Fail("Guests can only enter each raffle once! Create an account for " +
-                                            "more entries.");
+                return OperationResult<string>.Fail("Guests can only enter each raffle once! Create an account for " +
+                                                    "more entries.", "");
             
             if (await IsGuestParticipatingInDraw(drawId, guestEmail))
-                return OperationResult.Fail("You are already participating in this draw as a guest! Create an " +
-                                            "account for more entries.");
+                return OperationResult<string>.Fail("You are already participating in this draw as a guest! Create an " +
+                                                    "account for more entries.", "");
             
             var validEmail = IsValidEmailAddress(guestEmail);
             if (!validEmail.Success)
-                return validEmail;
+                return OperationResult<string>.Fail(validEmail.Message, "");
         }
 
         if (numberOfEntries > await CountCurrentUserEntriesRemainingByDraw(drawId))
-            return OperationResult.Fail("Selected number of entries exceeds available entries!");
+            return OperationResult<string>.Fail("Selected number of entries exceeds available entries!", "");
         
         List<EntryModel> entries = [];
 
+        var guestReferenceCode = Guid.NewGuid().ToString("N");
         if (isGuest)
         {
-            var guestReferenceCode = Guid.NewGuid().ToString("N");
             
             entries.Add(new EntryModel
             {
@@ -67,7 +67,7 @@ public class EntryManagementService(IUserService userService, IEntryService entr
         foreach (var entry in entries)
             await entryService.AddEntry(entry);
         
-        return OperationResult.Ok();
+        return OperationResult<string>.Ok(guestReferenceCode);
     }
 
     /// <summary>
@@ -125,27 +125,27 @@ public class EntryManagementService(IUserService userService, IEntryService entr
         }
     }
 
-    public async Task<OperationResult> TryEnterLottery(int drawId, IEnumerable<int> luckyNumbers)
+    public async Task<OperationResult<string>> TryEnterLottery(int drawId, IEnumerable<int> luckyNumbers)
     {
         var canEnter = await CurrentUserCanEnterDraw(drawId);
 
         if (!canEnter.Success)
-            return canEnter;
+            return OperationResult<string>.Fail(canEnter.Message, "");
 
         luckyNumbers = luckyNumbers.ToList();
         if (!luckyNumbers.Any())
-            return OperationResult.Fail("At least 1 Lucky Number must be selected.");
+            return OperationResult<string>.Fail("At least 1 Lucky Number must be selected.", "");
         
         if (luckyNumbers.Count() > await CountCurrentUserEntriesRemainingByDraw(drawId))
-            return OperationResult.Fail("Selected number of entries exceeds available entries!");
+            return OperationResult<string>.Fail("Selected number of entries exceeds available entries!", "");
 
         var availableLuckyNumbers = await GetAvailableLuckyNumbersByDraw(drawId);
         var unavailableNumbers = 
             luckyNumbers.Where(luckyNumber => !availableLuckyNumbers.Contains(luckyNumber)).ToList();
         
         if (unavailableNumbers.Count != 0)
-            return OperationResult.Fail($"Lucky Number(s) {string.Join(", ", unavailableNumbers)} is/are " +
-                                        $"not available!");
+            return OperationResult<string>.Fail($"Lucky Number(s) {string.Join(", ", unavailableNumbers)} is/are " +
+                                        $"not available!", "");
         
         List<EntryModel> entries = [];
 
@@ -162,7 +162,7 @@ public class EntryManagementService(IUserService userService, IEntryService entr
         foreach (var entry in entries)
             await entryService.AddEntry(entry);
         
-        return OperationResult.Ok();
+        return OperationResult<string>.Ok("");
     }
 
     public async Task<OperationResult> CurrentUserCanEnterDraw(int drawId)
