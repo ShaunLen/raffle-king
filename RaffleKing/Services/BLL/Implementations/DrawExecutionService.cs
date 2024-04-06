@@ -13,8 +13,7 @@ public class DrawExecutionService(IDrawService drawService, IEntryService entryS
     {
         if (scheduleTime <= DateTime.Now) return OperationResult.Fail("Scheduled time is not in the future!");
         
-        backgroundJobs.Schedule(() => ExecuteDraw(drawId), 
-            TimeZoneInfo.ConvertTimeToUtc(scheduleTime) - DateTime.UtcNow);
+        backgroundJobs.Schedule(() => ExecuteDraw(drawId), scheduleTime - DateTime.Now.AddHours(-1));
         return OperationResult.Ok();
     }
 
